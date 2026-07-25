@@ -12,16 +12,16 @@ import {
 const PROJECT_PDB_MODELS = [
   {
     id: '6WX6_A',
-    label: 'Ferritin Light Chain — Crystal Structure',
+    label: 'ESMFold Predicted Model (Ref: Crystal Structure 6WX6_A)',
     file: '/pdb/6WX6_A_model.pdb',
     plddt: 94.2,
     residues: 175,
-    desc: 'High-resolution X-ray crystal structure of human ferritin light chain from NCBI BLASTP.',
+    desc: 'High-resolution AI prediction based on the human ferritin light chain homolog from NCBI BLASTP.',
     badge: '⭐ Recommended',
   },
   {
     id: 'AAP36762.1',
-    label: 'Homo Sapiens Ferritin Light Polypeptide',
+    label: 'ESMFold Predicted Model (Homo Sapiens Ferritin)',
     file: '/pdb/AAP36762.1_model.pdb',
     plddt: 93.8,
     residues: 176,
@@ -30,7 +30,7 @@ const PROJECT_PDB_MODELS = [
   },
   {
     id: 'WP_217683847.1',
-    label: 'Pseudomonas Aeruginosa Ferritin Domain',
+    label: 'ESMFold Predicted Model (Pseudomonas Aeruginosa)',
     file: '/pdb/WP_217683847.1_model.pdb',
     plddt: 91.5,
     residues: 197,
@@ -168,7 +168,7 @@ export const Module2Structure: React.FC = () => {
 
   const activeSource = opMode === 'modeA'
     ? (mod2Data?.source ?? 'Meta AI ESMFold v1 API')
-    : 'NCBI BLASTP / PDB Archive';
+    : 'Meta ESMFold v1 / NCBI BLASTP';
 
   const activeRmsd = opMode === 'modeA'
     ? 'RMSD ≤ 2.1 Å (Zero-Shot ESMFold)'
@@ -176,7 +176,7 @@ export const Module2Structure: React.FC = () => {
 
   const activeMethod = opMode === 'modeA'
     ? 'ESMFold v1 Transformer'
-    : 'X-Ray Crystallography (PDB Archive / Dali)';
+    : 'AI Structure Prediction (Ref: X-Ray Crystallography)';
 
   const downloadPdb = () => {
     if (!activePdbContent) return;
@@ -319,9 +319,9 @@ export const Module2Structure: React.FC = () => {
           ) : (
             <>
               <div className="text-white font-bold text-sm">
-                Ferritin Light Chain (Reference: <span className="text-emerald-400">{selectedModel.id}</span>)
+                Ferritin Light Chain — AI Predicted Model ({selectedModel.residues} Residues)
               </div>
-              <div className="text-slate-400 text-[11px] mt-0.5">{selectedModel.label} ({selectedModel.residues} Residues)</div>
+              <div className="text-slate-400 text-[11px] mt-0.5">{selectedModel.label}</div>
             </>
           )}
         </div>

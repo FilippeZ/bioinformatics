@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Dna, ChevronDown, Zap, FlaskConical, BrainCircuit, Pill, ShieldCheck, ArrowRight, Heart, Sparkles } from 'lucide-react';
+import { Dna, ChevronDown, Zap, FlaskConical, BrainCircuit, Pill, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────
 const TOTAL_FRAMES = 36;

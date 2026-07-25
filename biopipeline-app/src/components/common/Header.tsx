@@ -1,5 +1,4 @@
-import React from 'react';
-import { Dna, RefreshCw, Menu } from 'lucide-react';
+import { RefreshCw, Menu } from 'lucide-react';
 import { usePipeline } from '../../context/PipelineContext';
 
 const STAGE_LABELS: Record<number, { emoji: string; plain: string }> = {

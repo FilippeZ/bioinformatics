@@ -42,7 +42,7 @@
 
 ![Stage 2 — Protein Structure](docs/screenshots/stage2_protein_structure.png)
 
-*Meta AI ESMFold v1 predicts the 3D fold of the target protein. Interactive WebGL viewer (NGL) with pLDDT confidence heatmap, residue count, and downloadable PDB file*
+*Meta AI ESMFold v1 predicts the exact 3D backbone structure of your target protein. Interactive WebGL viewer (NGL) with pLDDT confidence heatmap, residue count, structural telemetry, and ESMFold predicted benchmark models (Ref: Crystal Structure 6WX6_A).*
 
 ---
 
