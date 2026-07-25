@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BioHelix | Stage 4: Cheminformatics &amp; Rule-Based Filtering</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Hanken+Grotesk:wght@500;600;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --neon-blue: #00E0FF;
+            --neon-green: #00FF7F;
+        }
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid #222222;
+        }
+        .molecule-card:hover {
+            border-color: var(--neon-blue);
+            background: rgba(0, 224, 255, 0.03);
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 2px;
+            cursor: pointer;
+            background: #222222;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            height: 12px;
+            width: 12px;
+            border-radius: 0;
+            background: var(--neon-blue);
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -5px;
+            box-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+        }
+        .step-active {
+            color: var(--neon-green);
+        }
+        .step-line {
+            height: 1px;
+            background: #222222;
+            flex-grow: 1;
+            margin: 0 12px;
+        }
+        .reduction-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#3a3939",
+                        "primary-fixed-dim": "#00e471",
+                        "inverse-primary": "#006d33",
+                        "surface-container": "#201f1f",
+                        "tertiary": "#fffafb",
+                        "surface-base": "#0A0A0A",
+                        "secondary-fixed-dim": "#00daf8",
+                        "data-error": "#FF3B30",
+                        "surface-tint": "#00e471",
+                        "on-secondary-container": "#005f6d",
+                        "outline-variant": "#3b4b3c",
+                        "inverse-on-surface": "#313030",
+                        "border-subtle": "#222222",
+                        "error-container": "#93000a",
+                        "tertiary-fixed": "#efdbff",
+                        "on-surface-variant": "#b9cbb8",
+                        "neon-blue": "#00E0FF",
+                        "outline": "#849584",
+                        "inverse-surface": "#e5e2e1",
+                        "on-secondary": "#00363f",
+                        "tertiary-container": "#edd6ff",
+                        "on-secondary-fixed": "#001f25",
+                        "surface-raised": "#141414",
+                        "secondary": "#b9f1ff",
+                        "on-tertiary-fixed": "#2c0051",
+                        "on-surface": "#e5e2e1",
+                        "on-primary-fixed-variant": "#005224",
+                        "tertiary-fixed-dim": "#dcb8ff",
+                        "primary-fixed": "#63ff93",
+                        "on-background": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#6700b5",
+                        "surface-container-high": "#2a2a2a",
+                        "primary": "#f0ffed",
+                        "secondary-fixed": "#a5eeff",
+                        "secondary-container": "#00e0ff",
+                        "surface-container-low": "#1c1b1b",
+                        "neon-green": "#00FF7F",
+                        "on-secondary-fixed-variant": "#004e5a",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-primary": "#003917",
+                        "background": "#131313",
+                        "surface": "#131313",
+                        "primary-container": "#00ff7f",
+                        "on-tertiary": "#480081",
+                        "on-primary-container": "#007134",
+                        "error": "#ffb4ab",
+                        "surface-variant": "#353534",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-container": "#8828e0",
+                        "text-muted": "#888888",
+                        "surface-container-highest": "#353534",
+                        "on-primary-fixed": "#00210b",
+                        "surface-dim": "#131313",
+                        "on-error": "#690005"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "unit": "4px",
+                        "margin-desktop": "32px",
+                        "margin-mobile": "16px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "label-mono": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "data-tabular": ["JetBrains Mono"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface-base">
+<!-- TopNavBar Execution -->
+<nav class="flex justify-between items-center px-margin-desktop h-14 w-full z-50 bg-surface-base fixed top-0 border-b border-border-subtle">
+<div class="flex items-center gap-8">
+<span class="font-headline-md text-headline-md font-bold text-on-surface tracking-tighter">BioHelix</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200" href="#">Dashboard</a>
+<a class="text-primary-fixed-dim font-bold border-b-2 border-primary-fixed-dim pb-1 transition-colors duration-200" href="#">Workspaces</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200" href="#">Experiments</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200" href="#">Compute</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200" href="#">Registry</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary-fixed-dim">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary-fixed-dim">settings</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary-fixed-dim">help</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden border border-border-subtle">
+<img class="w-full h-full object-cover" data-alt="Professional headshot of a bioinformatics scientist in a high-tech laboratory setting, wearing minimalist dark clothing, soft studio lighting reflecting off analytical equipment in the background, sharp focus, 8k resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDphJxxIw8ezbOPuClvZPvUj_7WYQlpyVXlV5ZNALgphBMqzYwJpHhvTc4BSt9qedywGcraUz6UtaeU5ffUUUhsFZaGGQ94Sqky2f8T68oRvF81ba_tpY48tfLATRJDqGBlfc3JZSOJXlanl4VAszZZ_iHSnPr7zUtzWulvMqFnjXZpBwkExqMEG5uAuUOH20jwcO8YvGXeAs-RrIq3G7ROsHAWoeDQKDT0U5muAKeMvcBa4Qm0U2qjyZ7EwnwUgMNORqsIGHAC2_k"/>
+</div>
+</div>
+</nav>
+<!-- SideNavBar Execution -->
+<aside class="fixed left-0 top-14 bottom-0 flex flex-col w-64 z-40 bg-surface-container border-r border-border-subtle">
+<div class="p-6 border-b border-border-subtle">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-2 h-2 rounded-full bg-neon-green reduction-pulse"></div>
+<span class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant">Session Nodes</span>
+</div>
+<h3 class="font-body-md text-on-surface font-bold">RTX-4090-Cluster-A</h3>
+<p class="text-[10px] font-label-mono text-primary-fixed-dim">ACTIVE KERNEL: CHEMINF-V4</p>
+</div>
+<nav class="flex-1 py-4 overflow-y-auto">
+<div class="flex items-center bg-surface-bright text-neon-blue border-l-2 border-neon-blue font-bold py-3 px-4 mb-1 cursor-pointer">
+<span class="material-symbols-outlined mr-3">monitoring</span>
+<span class="font-label-mono text-label-mono">Telemetry</span>
+</div>
+<div class="flex items-center text-on-surface-variant hover:bg-surface-container-high py-3 px-4 transition-all cursor-pointer">
+<span class="material-symbols-outlined mr-3">terminal</span>
+<span class="font-label-mono text-label-mono">MLflow Logs</span>
+</div>
+<div class="flex items-center text-on-surface-variant hover:bg-surface-container-high py-3 px-4 transition-all cursor-pointer">
+<span class="material-symbols-outlined mr-3">memory</span>
+<span class="font-label-mono text-label-mono">Memory Usage</span>
+</div>
+<div class="flex items-center text-on-surface-variant hover:bg-surface-container-high py-3 px-4 transition-all cursor-pointer">
+<span class="material-symbols-outlined mr-3">developer_board</span>
+<span class="font-label-mono text-label-mono">GPU Metrics</span>
+</div>
+<div class="flex items-center text-on-surface-variant hover:bg-surface-container-high py-3 px-4 transition-all cursor-pointer">
+<span class="material-symbols-outlined mr-3">query_stats</span>
+<span class="font-label-mono text-label-mono">Weights</span>
+</div>
+</nav>
+<div class="p-4 border-t border-border-subtle space-y-2">
+<div class="flex items-center text-on-surface-variant hover:text-on-surface text-sm cursor-pointer">
+<span class="material-symbols-outlined mr-2 text-sm">menu_book</span> Documentation
+            </div>
+<div class="flex items-center text-on-surface-variant hover:text-on-surface text-sm cursor-pointer">
+<span class="material-symbols-outlined mr-2 text-sm">support_agent</span> Support
+            </div>
+<button class="w-full mt-4 bg-surface-container-highest border border-border-subtle py-2 text-label-mono text-[11px] uppercase tracking-widest hover:bg-on-surface-variant hover:text-surface-base transition-all">
+                Restart Kernel
+            </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 mt-14 p-gutter max-w-full">
+<!-- Stage Stepper -->
+<div class="mb-8 flex items-center px-4">
+<div class="flex items-center text-on-surface-variant text-[11px] font-label-mono uppercase tracking-widest">
+<span class="w-6 h-6 border border-border-subtle flex items-center justify-center mr-2">01</span>
+                Sourcing
+            </div>
+<div class="step-line"></div>
+<div class="flex items-center text-on-surface-variant text-[11px] font-label-mono uppercase tracking-widest">
+<span class="w-6 h-6 border border-border-subtle flex items-center justify-center mr-2">02</span>
+                Docking
+            </div>
+<div class="step-line"></div>
+<div class="flex items-center text-on-surface-variant text-[11px] font-label-mono uppercase tracking-widest">
+<span class="w-6 h-6 border border-border-subtle flex items-center justify-center mr-2">03</span>
+                Simulation
+            </div>
+<div class="step-line"></div>
+<div class="flex items-center text-neon-green text-[11px] font-label-mono uppercase tracking-widest">
+<span class="w-6 h-6 border border-neon-green flex items-center justify-center mr-2">04</span>
+                Cheminformatics
+            </div>
+</div>
+<!-- Header Section -->
+<header class="mb-8 flex justify-between items-end">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Rule-Based Filtering</h1>
+<p class="text-on-surface-variant font-body-md mt-1">Applying Lipinski’s Rule of Five to 14,240 predicted candidates.</p>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-2 border border-border-subtle font-label-mono text-[12px] hover:bg-surface-container-high transition-all">
+                    LOAD FDA LIST
+                </button>
+<button class="px-6 py-2 bg-on-surface text-surface-base font-label-mono text-[12px] font-bold hover:bg-neon-blue transition-all">
+                    UPLOAD DATASET
+                </button>
+</div>
+</header>
+<!-- Status Banner -->
+<div class="w-full bg-surface-container-lowest border border-primary-fixed-dim/30 p-4 mb-8 flex items-center justify-between">
+<div class="flex items-center gap-6">
+<div class="flex flex-col">
+<span class="text-[10px] font-label-mono text-on-surface-variant uppercase">Reduction Rate</span>
+<span class="text-2xl font-headline-md text-neon-green font-bold">95.0% <span class="text-sm font-normal opacity-60">Noise Removed</span></span>
+</div>
+<div class="h-10 w-px bg-border-subtle"></div>
+<div class="flex flex-col">
+<span class="text-[10px] font-label-mono text-on-surface-variant uppercase">Remaining Candidates</span>
+<span class="text-2xl font-headline-md text-on-surface font-bold">712 <span class="text-sm font-normal opacity-60">Molecules</span></span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-neon-green reduction-pulse">check_circle</span>
+<span class="text-label-mono text-[12px] text-neon-green">FILTERS APPLIED SUCCESSFULLY</span>
+</div>
+</div>
+<!-- Filtering Grid -->
+<div class="grid grid-cols-12 gap-gutter mb-12">
+<!-- Left: Rule of 5 Sliders -->
+<div class="col-span-3 space-y-6">
+<div class="glass-panel p-6">
+<h3 class="font-label-mono text-label-mono uppercase text-on-surface-variant mb-6 flex justify-between">
+                        Rule of 5 Parameters
+                        <span class="material-symbols-outlined text-sm">tune</span>
+</h3>
+<div class="space-y-8">
+<!-- Mol Weight -->
+<div class="space-y-2">
+<div class="flex justify-between font-label-mono text-[11px]">
+<span class="text-on-surface">Molecular Weight</span>
+<span class="text-neon-blue">≤ 500 Da</span>
+</div>
+<input max="1000" min="100" type="range" value="500"/>
+<div class="flex justify-between text-[10px] text-on-surface-variant">
+<span>100</span>
+<span>1000</span>
+</div>
+</div>
+<!-- LogP -->
+<div class="space-y-2">
+<div class="flex justify-between font-label-mono text-[11px]">
+<span class="text-on-surface">Octanol-Water (LogP)</span>
+<span class="text-neon-blue">≤ 5.0</span>
+</div>
+<input max="10" min="-2" step="0.1" type="range" value="5"/>
+<div class="flex justify-between text-[10px] text-on-surface-variant">
+<span>-2.0</span>
+<span>10.0</span>
+</div>
+</div>
+<!-- HBD -->
+<div class="space-y-2">
+<div class="flex justify-between font-label-mono text-[11px]">
+<span class="text-on-surface">H-Bond Donors</span>
+<span class="text-neon-blue">≤ 5</span>
+</div>
+<input max="15" min="0" type="range" value="5"/>
+<div class="flex justify-between text-[10px] text-on-surface-variant">
+<span>0</span>
+<span>15</span>
+</div>
+</div>
+<!-- HBA -->
+<div class="space-y-2">
+<div class="flex justify-between font-label-mono text-[11px]">
+<span class="text-on-surface">H-Bond Acceptors</span>
+<span class="text-neon-blue">≤ 10</span>
+</div>
+<input max="25" min="0" type="range" value="10"/>
+<div class="flex justify-between text-[10px] text-on-surface-variant">
+<span>0</span>
+<span>25</span>
+</div>
+</div>
+</div>
+<button class="w-full mt-8 py-3 border border-neon-blue/40 text-neon-blue font-label-mono text-[12px] uppercase hover:bg-neon-blue/10 transition-all">
+                        Reset Defaults
+                    </button>
+</div>
+<div class="glass-panel p-4 border-l-4 border-l-neon-blue">
+<p class="text-[11px] font-label-mono text-on-surface-variant leading-relaxed">
+<span class="text-neon-blue font-bold">INFO:</span> Lipinski's Rule of 5 is a rule of thumb to evaluate druglikeness. A molecule is more likely to be membrane permeable if it follows these criteria.
+                    </p>
+</div>
+</div>
+<!-- Right: Molecule Grid -->
+<div class="col-span-9">
+<div class="flex justify-between items-center mb-4">
+<div class="flex gap-4">
+<div class="px-3 py-1 bg-surface-container-high border border-border-subtle flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">grid_view</span>
+<span class="text-[11px] font-label-mono uppercase">Grid</span>
+</div>
+<div class="px-3 py-1 text-on-surface-variant flex items-center gap-2 cursor-pointer hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">list</span>
+<span class="text-[11px] font-label-mono uppercase">Table</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-label-mono text-[11px]">
+                        SORT BY: 
+                        <select class="bg-transparent border-none text-neon-blue font-bold focus:ring-0 cursor-pointer">
+<option>DOCKING SCORE (DESC)</option>
+<option>MOL WEIGHT</option>
+<option>LOGP</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-4 gap-4">
+<!-- Molecule Card Generator (Placeholder for 712 items) -->
+<!-- Item 1 -->
+<div class="molecule-card glass-panel p-4 flex flex-col transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-3">
+<span class="text-[10px] font-label-mono text-on-surface-variant">#BH-712-001</span>
+<span class="px-1.5 py-0.5 bg-neon-green/10 text-neon-green text-[9px] font-label-mono">PASS</span>
+</div>
+<div class="h-32 w-full bg-white mb-4 relative flex items-center justify-center p-2">
+<img class="max-h-full max-w-full mix-blend-multiply opacity-80" data-alt="High-contrast 2D chemical structure of a complex organic molecule with benzene rings and nitrogen clusters, rendered in a clean technical line-art style on a pure white background, minimal and precise." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2dcfnpZg9Ppjdrzj15gYHaENL2v9tzYt4D2s84B3Ly0nQyQZjjnnOlmbTBizgvUUVMBS5H347SMbkv5H9oYBwLyUdSUfpWWbO6f9TwIdwgAPE7ke3LYcy3IBod1Ir19NXHrnoTkEHuMBPtzWe4gwbMoyobVSNERgtkF8dIXV66duu5quPp-VWUyyIMHUZXDZ7htfWbOYQaRdqaVZG50XhUYVTF-zBXT2c1i8rRP5OdaQC0LlmLTsBa1mvsL3w21SPVAyTYottakc"/>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">MW:</span>
+<span class="font-data-tabular">342.12 Da</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">LogP:</span>
+<span class="font-data-tabular">2.45</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">Score:</span>
+<span class="font-data-tabular text-neon-blue">-8.4 kcal</span>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="molecule-card glass-panel p-4 flex flex-col transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-3">
+<span class="text-[10px] font-label-mono text-on-surface-variant">#BH-712-002</span>
+<span class="px-1.5 py-0.5 bg-neon-green/10 text-neon-green text-[9px] font-label-mono">PASS</span>
+</div>
+<div class="h-32 w-full bg-white mb-4 relative flex items-center justify-center p-2">
+<img class="max-h-full max-w-full mix-blend-multiply opacity-80" data-alt="Technical 2D representation of an FDA-approved molecule structure, showing chiral centers and hydroxyl groups, professional cheminformatics software aesthetic, high-precision lines, white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqH3kwsbFXUH2ijDnVMDY3HT6z5BixBwUgg9HfuHlZbb1ZuGl4dcClVUHY60UhwfVRQ0FqoWTqtG4AIIOuVy0TXPUzC1YGsQlFpd6VwrA8-KKUH8gcCRX01GBW6O_BDWcvFpkgZD5J5dtpCKG8wpU9NJQa5T3T_32iFL3rFKits22lXCzsyQcKKRG3L-Jmv8892VZb6jjgmi2DSiub411MZxuf2nqPA2acqH0fnivjQOfnK5xhFf_u3EOmp_5WCNBbYCok16WzAq0"/>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">MW:</span>
+<span class="font-data-tabular">412.05 Da</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">LogP:</span>
+<span class="font-data-tabular">3.81</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">Score:</span>
+<span class="font-data-tabular text-neon-blue">-7.9 kcal</span>
+</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="molecule-card glass-panel p-4 flex flex-col transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-3">
+<span class="text-[10px] font-label-mono text-on-surface-variant">#BH-712-003</span>
+<span class="px-1.5 py-0.5 bg-neon-green/10 text-neon-green text-[9px] font-label-mono">PASS</span>
+</div>
+<div class="h-32 w-full bg-white mb-4 relative flex items-center justify-center p-2">
+<img class="max-h-full max-w-full mix-blend-multiply opacity-80" data-alt="Clean 2D skeletal structure of a small molecule drug candidate with a pyridine ring, technical drawing style used in medicinal chemistry publications, high resolution, black lines on white." src="https://lh3.googleusercontent.com/aida-public/AB6AXuASpvNMb2HEGyEjqAb9KZ1EMTG3UNbeALh2rH_fljYBtwycZ7sWTXHLJN4kZn2DBHOAxI_Va9ttpqD8nHIY-xP2bVV7nqKcW6-CMv3pACE81JfsN1khPpd9_0vkoSkKxnAdHJcjfSgE1l-RmFYz6OQZAztVdI254HP3JLIstyw4CrdxxA_y_B1OIVVrxo2rogps9-SlwLBkQQOkKPN3Wr0ea7KGaMxGlSDXfzKzMihrKFmSHhMsEBfjklFXaN8dEOPEm7nFFduDWS8"/>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">MW:</span>
+<span class="font-data-tabular">289.44 Da</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">LogP:</span>
+<span class="font-data-tabular">1.12</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">Score:</span>
+<span class="font-data-tabular text-neon-blue">-7.1 kcal</span>
+</div>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="molecule-card glass-panel p-4 flex flex-col transition-all cursor-pointer border-neon-blue/30">
+<div class="flex justify-between items-start mb-3">
+<span class="text-[10px] font-label-mono text-on-surface-variant">#BH-712-004</span>
+<span class="px-1.5 py-0.5 bg-neon-green/10 text-neon-green text-[9px] font-label-mono">PASS</span>
+</div>
+<div class="h-32 w-full bg-white mb-4 relative flex items-center justify-center p-2">
+<img class="max-h-full max-w-full mix-blend-multiply opacity-80" data-alt="Detailed molecular diagram of a heterocyclic compound, featuring multiple rings and functional groups like carboxylic acid, rendered with academic precision, technical line style, stark white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8VC-h8qUi1cXuvNHCFFk9G59jmo0ZRdOVi25lLdfoTxAltdSQpnC3rxgZo9lRV_YOWpp45i5GTM0wdKrSHtiAdLiPef-lAm8aIo4QKPhgJC7g8yognK-EThUAxKkpkzVYxkFROKuG8d0NNsh5WdOb4gm272pnIO4Zpwf6AWj1R2vyuncQ24wZhC-iTdfGcFO03qNZF1kBRJY5tSbfBvNRq-Jvl8_J4j2nCeNmIVEuEjO4_kbxjDyBazpR7rC-Dyo8JROfSo3pNMk"/>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">MW:</span>
+<span class="font-data-tabular">498.90 Da</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">LogP:</span>
+<span class="font-data-tabular">4.95</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">Score:</span>
+<span class="font-data-tabular text-neon-blue">-9.2 kcal</span>
+</div>
+</div>
+</div>
+<!-- Repeated Items for Density -->
+<div class="molecule-card glass-panel p-4 flex flex-col transition-all cursor-pointer opacity-80">
+<div class="h-32 w-full bg-white mb-4 flex items-center justify-center p-2">
+<img class="max-h-full max-w-full mix-blend-multiply opacity-60" data-alt="Technical 2D chemical structure drawing, macrocyclic ring system with peptide bonds, minimalist scientific illustration, high resolution, white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMEB87yaD4ST0Ka6TIjSEfzbRbGdpKr4dcaw8Uhl8McW0ih03Xv8xBmbIXH6db6Q_qEh6HH_mR65E3qBFk0IB2gLszVbVq2hk341nwMDaom_M3Oog1QqqSD053sqr3O_J9WORgvRxrblNjSbgN2W5_sSk3DMJIzQ9y6A3WD-r46L6aSDJQhFYejMIISqq55nxM1L8Q6U7oNWeqDVOn3QFCetdohsvjThI0qU_rbrGwrkdV0gtMVHNCwBr_pQ0zEw8BQ-86Q-WCJxM"/>
+</div>
+<div class="h-2 bg-surface-container-high w-3/4 mb-1"></div>
+<div class="h-2 bg-surface-container-high w-1/2"></div>
+</div>
+<div class="molecule-card glass-panel p-4 flex flex-col transition-all cursor-pointer opacity-80">
+<div class="h-32 w-full bg-white mb-4 flex items-center justify-center p-2">
+<img class="max-h-full max-w-full mix-blend-multiply opacity-60" data-alt="Precision molecular model of a sulfonamide drug molecule, skeletal structure view, clean black line work, scientific diagram aesthetic, isolated on white." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAw6L77dL8I1z54kw0K9AD9dVaR84WC8f_n-7r1zxlPZnUqxnKmvQNSKf0EsNNbLfSpJlgoPiYhDmljIC9Caig9pHTzpOxzAlJatF5luHn9DsA9pHtjPhfpP9tEnQ5YIkxgdhCVqHFEJDIbEuS157ozdalm1T7doxoBJYw31sYHdLoPNDV0XuFm0I7s4WdNwEDO2Ydgbvly8us6RZZXTjHQeQWKrWoC7Vq5BKPiKtWkbACsE728RNKZQV8TLgvn_pF31fmj8-UgMX0"/>
+</div>
+<div class="h-2 bg-surface-container-high w-3/4 mb-1"></div>
+<div class="h-2 bg-surface-container-high w-1/2"></div>
+</div>
+<div class="molecule-card glass-panel p-4 flex flex-col transition-all cursor-pointer opacity-80">
+<div class="h-32 w-full bg-white mb-4 flex items-center justify-center p-2">
+<img class="max-h-full max-w-full mix-blend-multiply opacity-60" data-alt="Advanced chemical structure of a flavonoid molecule, 2D line drawing, scientific publication quality, technical blueprint aesthetic, pure white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVe3kIphqn2dbsmi90sc6p-HLCs2Sz9QDv3luElCMxuz6aaQTsu_4FLbvbu4MFDD3I7cdM-tB-GlZwjFFwR0W-OqvDmp8AptlvHTBdAAheJd7tojLosl8DdAq-BYrkn3WPNAYg2AI1DT4Jp7HdFfVMp7mwSLbBQjTPukG-HgDjL4qNcpveGNzCaQyE680NPBzVplzQPnVCFIdeK9DsUCMyQiiaVmaTeitciOr4k8oO5JK3OKXGAnSw6UCIkYfUfUtPZvvJzD8VxPg"/>
+</div>
+<div class="h-2 bg-surface-container-high w-3/4 mb-1"></div>
+<div class="h-2 bg-surface-container-high w-1/2"></div>
+</div>
+<div class="molecule-card glass-panel p-4 flex flex-col transition-all cursor-pointer opacity-80">
+<div class="h-32 w-full bg-white mb-4 flex items-center justify-center p-2">
+<img class="max-h-full max-w-full mix-blend-multiply opacity-60" data-alt="Molecular diagram of a synthetic steroid candidate, skeletal representation with precise stereo-chemical notations, laboratory journal style, clean and minimalist on white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuABoGEzWXGGaHqWpxsQC-cU3nDTT_CH7J-TFvg1UQ_-xqX6IkGdvsK5CPj-pTXzSpiRoVLd1_ugVmmuuvKRw8sqfiwUTcqFJtqaba6kXmz4V0z7790NUe5QrDrCIkBR6Y3tE_Qhik9XeSBIKdE9Ba9kkWKogtKyR9ILeyvECfyyQ9XLSAC739WRLqSH4B1qIfcTeFxsDFnzR1n2Yy6hBkGNMQ7S2cAh-czJqBVIXUOflamY2mzWCIkRbu0etyYGxz9Fci_jpyoczjE"/>
+</div>
+<div class="h-2 bg-surface-container-high w-3/4 mb-1"></div>
+<div class="h-2 bg-surface-container-high w-1/2"></div>
+</div>
+</div>
+<div class="mt-8 flex justify-center">
+<div class="flex items-center gap-2 font-label-mono text-[12px]">
+<button class="w-8 h-8 flex items-center justify-center border border-border-subtle hover:bg-surface-container-high">«</button>
+<button class="w-8 h-8 flex items-center justify-center bg-neon-blue text-surface-base font-bold">1</button>
+<button class="w-8 h-8 flex items-center justify-center border border-border-subtle hover:bg-surface-container-high">2</button>
+<button class="w-8 h-8 flex items-center justify-center border border-border-subtle hover:bg-surface-container-high">3</button>
+<span class="px-2">...</span>
+<button class="w-8 h-8 flex items-center justify-center border border-border-subtle hover:bg-surface-container-high">18</button>
+<button class="w-8 h-8 flex items-center justify-center border border-border-subtle hover:bg-surface-container-high">»</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual FAB - Export Action -->
+<div class="fixed bottom-margin-desktop right-margin-desktop z-50">
+<button class="group flex items-center gap-3 bg-neon-green px-6 py-4 rounded-full text-surface-base font-bold shadow-[0_0_20px_rgba(0,255,127,0.4)] hover:scale-105 transition-all">
+<span class="font-label-mono text-[13px] uppercase tracking-wider">Export filtered set</span>
+<span class="material-symbols-outlined font-bold">rocket_launch</span>
+</button>
+</div>
+<!-- Data Animation Layer (Subtle Ambient) -->
+<div class="fixed inset-0 pointer-events-none z-[-1] opacity-20">
+
+</div>
+<script>
+        // Micro-interactions for sliders
+        const sliders = document.querySelectorAll('input[type="range"]');
+        sliders.forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                const valSpan = e.target.closest('.space-y-2').querySelector('.text-neon-blue');
+                const label = e.target.closest('.space-y-2').querySelector('.text-on-surface').innerText;
+                
+                if (label === 'Molecular Weight') valSpan.innerText = `≤ ${e.target.value} Da`;
+                if (label === 'Octanol-Water (LogP)') valSpan.innerText = `≤ ${parseFloat(e.target.value).toFixed(1)}`;
+                if (label === 'H-Bond Donors') valSpan.innerText = `≤ ${e.target.value}`;
+                if (label === 'H-Bond Acceptors') valSpan.innerText = `≤ ${e.target.value}`;
+                
+                // Simulate processing flicker
+                document.querySelector('.reduction-pulse').style.animation = 'none';
+                setTimeout(() => {
+                    document.querySelector('.reduction-pulse').style.animation = 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite';
+                }, 10);
+            });
+        });
+
+        // Toggle Active Sidebar Tab
+        const navItems = document.querySelectorAll('aside nav > div');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                navItems.forEach(i => {
+                    i.classList.remove('bg-surface-bright', 'text-neon-blue', 'border-l-2', 'border-neon-blue', 'font-bold');
+                    i.classList.add('text-on-surface-variant', 'hover:bg-surface-container-high');
+                });
+                item.classList.add('bg-surface-bright', 'text-neon-blue', 'border-l-2', 'border-neon-blue', 'font-bold');
+                item.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-high');
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BioHelix | ESMFold Model Integration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Hanken+Grotesk:wght@500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#3a3939",
+                    "primary-fixed-dim": "#00e471",
+                    "inverse-primary": "#006d33",
+                    "surface-container": "#201f1f",
+                    "tertiary": "#fffafb",
+                    "surface-base": "#0A0A0A",
+                    "secondary-fixed-dim": "#00daf8",
+                    "data-error": "#FF3B30",
+                    "surface-tint": "#00e471",
+                    "on-secondary-container": "#005f6d",
+                    "outline-variant": "#3b4b3c",
+                    "inverse-on-surface": "#313030",
+                    "border-subtle": "#222222",
+                    "error-container": "#93000a",
+                    "tertiary-fixed": "#efdbff",
+                    "on-surface-variant": "#b9cbb8",
+                    "neon-blue": "#00E0FF",
+                    "outline": "#849584",
+                    "inverse-surface": "#e5e2e1",
+                    "on-secondary": "#00363f",
+                    "tertiary-container": "#edd6ff",
+                    "on-secondary-fixed": "#001f25",
+                    "surface-raised": "#141414",
+                    "secondary": "#b9f1ff",
+                    "on-tertiary-fixed": "#2c0051",
+                    "on-surface": "#e5e2e1",
+                    "on-primary-fixed-variant": "#005224",
+                    "tertiary-fixed-dim": "#dcb8ff",
+                    "primary-fixed": "#63ff93",
+                    "on-background": "#e5e2e1",
+                    "on-tertiary-fixed-variant": "#6700b5",
+                    "surface-container-high": "#2a2a2a",
+                    "primary": "#f0ffed",
+                    "secondary-fixed": "#a5eeff",
+                    "secondary-container": "#00e0ff",
+                    "surface-container-low": "#1c1b1b",
+                    "neon-green": "#00FF7F",
+                    "on-secondary-fixed-variant": "#004e5a",
+                    "surface-container-lowest": "#0e0e0e",
+                    "on-primary": "#003917",
+                    "background": "#131313",
+                    "surface": "#131313",
+                    "primary-container": "#00ff7f",
+                    "on-tertiary": "#480081",
+                    "on-primary-container": "#007134",
+                    "error": "#ffb4ab",
+                    "surface-variant": "#353534",
+                    "on-error-container": "#ffdad6",
+                    "on-tertiary-container": "#8828e0",
+                    "text-muted": "#888888",
+                    "surface-container-highest": "#353534",
+                    "on-primary-fixed": "#00210b",
+                    "surface-dim": "#131313",
+                    "on-error": "#690005"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "unit": "4px",
+                    "margin-desktop": "32px",
+                    "margin-mobile": "16px",
+                    "container-max": "1440px"
+            },
+            "fontFamily": {
+                    "label-mono": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "data-tabular": ["JetBrains Mono"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-mono": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                    "data-tabular": ["13px", {"lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #222222; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3a3939; }
+
+        .protein-sequence-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
+            gap: 2px;
+        }
+        
+        .glow-border {
+            box-shadow: inset 0 0 0 1px rgba(0, 224, 255, 0.1);
+        }
+
+        .active-step-line {
+            background: linear-gradient(90deg, #00e471 0%, transparent 100%);
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md overflow-hidden">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-margin-desktop h-14 w-full z-50 bg-surface-base border-b border-border-subtle fixed top-0 left-0">
+<div class="flex items-center gap-8">
+<span class="font-headline-md text-headline-md font-bold text-on-surface tracking-tighter">BioHelix</span>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200" href="#">Dashboard</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200" href="#">Workspaces</a>
+<a class="text-primary-fixed-dim font-bold border-b-2 border-primary-fixed-dim pb-1 hover:text-primary-fixed-dim transition-colors duration-200" href="#">Experiments</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200" href="#">Compute</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200" href="#">Registry</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed-dim transition-all">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed-dim transition-all">settings</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed-dim transition-all">help</button>
+<div class="w-8 h-8 rounded-full border border-border-subtle bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional portrait of a bioengineer in a clean, high-tech laboratory setting. The lighting is cold and clinical, emphasizing the technical environment. The person is wearing minimalist glasses and a dark, modern lab coat. The overall aesthetic is minimalist-technical, with deep charcoal and neon green accents in the background blurred out." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxtN06QG9hJf41qh43QQLZvxkZJSLEhJuUWekmS7_YvV4HSFvUOxLYyDelW9SEK6dgEK_DPPdNQeAWpUjogjn2-d3uceWXf1X3TPkGYvbO03tjaKMRbSWThTpGQRZ_b372i4QTe_98abqdNcU4pKnxPa7dsSSux4hSHFZedwTLRHxhFIRFbj_Kzdm3spkbF0ATxgGfcvlFtdkOrp-L8OdWJ2AmRX4AucsMxMlKt99KzTy6nt_P-LK1OhcjaVztZS-I3qPbf8CfRGU"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Telemetry & Stats) -->
+<aside class="fixed left-0 top-14 bottom-0 flex flex-col w-64 z-40 bg-surface-container border-r border-border-subtle">
+<div class="p-6 border-b border-border-subtle">
+<span class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant block mb-1">Session Nodes</span>
+<h2 class="font-body-md text-on-surface font-bold">RTX-4090-Cluster-A</h2>
+<div class="flex items-center gap-2 mt-2">
+<div class="w-2 h-2 rounded-full bg-neon-green animate-pulse"></div>
+<span class="font-label-mono text-label-mono text-neon-green">Status: Active</span>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto py-4">
+<div class="mb-6">
+<span class="px-6 font-label-mono text-[10px] text-on-surface-variant uppercase tracking-tighter opacity-50 block mb-2">Live Telemetry</span>
+<div class="bg-surface-bright text-neon-blue border-l-2 border-neon-blue font-bold py-3 px-6 flex items-center gap-3">
+<span class="material-symbols-outlined text-[18px]">monitoring</span>
+<span class="font-label-mono text-label-mono">Telemetry</span>
+</div>
+<div class="text-on-surface-variant hover:bg-surface-container-high py-3 px-6 transition-all flex items-center gap-3 cursor-pointer">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+<span class="font-label-mono text-label-mono">MLflow Logs</span>
+</div>
+<div class="text-on-surface-variant hover:bg-surface-container-high py-3 px-6 transition-all flex items-center gap-3 cursor-pointer">
+<span class="material-symbols-outlined text-[18px]">memory</span>
+<span class="font-label-mono text-label-mono">Memory Usage</span>
+</div>
+<div class="text-on-surface-variant hover:bg-surface-container-high py-3 px-6 transition-all flex items-center gap-3 cursor-pointer">
+<span class="material-symbols-outlined text-[18px]">developer_board</span>
+<span class="font-label-mono text-label-mono">GPU Metrics</span>
+</div>
+</div>
+<div class="px-6 mb-6">
+<span class="font-label-mono text-[10px] text-on-surface-variant uppercase tracking-tighter opacity-50 block mb-3">Model Quality</span>
+<div class="space-y-4">
+<div class="p-3 bg-surface-base border border-border-subtle rounded">
+<div class="flex justify-between items-end mb-1">
+<span class="font-label-mono text-[11px] text-on-surface-variant">Mean pLDDT</span>
+<span class="font-label-mono text-neon-green text-sm">88.4</span>
+</div>
+<div class="h-1 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-neon-green w-[88.4%]"></div>
+</div>
+</div>
+<div class="p-3 bg-surface-base border border-border-subtle rounded">
+<div class="flex justify-between items-center">
+<span class="font-label-mono text-[11px] text-on-surface-variant">Confidence</span>
+<span class="px-2 py-0.5 bg-neon-green/10 text-neon-green rounded text-[10px] font-bold">HIGH</span>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<div class="p-6 mt-auto border-t border-border-subtle bg-surface-container-low">
+<button class="w-full py-2 bg-on-surface text-surface-base font-bold text-xs uppercase tracking-widest hover:bg-neon-blue transition-colors">
+                Restart Kernel
+            </button>
+<div class="mt-4 flex flex-col gap-2">
+<a class="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-[16px]">menu_book</span>
+<span class="font-label-mono text-[11px]">Documentation</span>
+</a>
+<a class="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined text-[16px]">support_agent</span>
+<span class="font-label-mono text-[11px]">Support</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="fixed left-64 top-14 right-0 bottom-0 overflow-y-auto bg-surface-base p-gutter">
+<!-- Workspace Header & Stepper -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+<div>
+<nav class="flex items-center gap-2 mb-2">
+<span class="font-label-mono text-[10px] text-on-surface-variant uppercase tracking-widest">Workspace</span>
+<span class="material-symbols-outlined text-[12px] text-on-surface-variant">chevron_right</span>
+<span class="font-label-mono text-[10px] text-primary-fixed-dim uppercase tracking-widest">Active Inference</span>
+</nav>
+<h1 class="font-headline-md text-headline-md text-on-surface font-bold">Stage 2: Foundation Model Integration</h1>
+</div>
+<!-- Stepper -->
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 opacity-40">
+<div class="w-8 h-8 rounded-full border border-on-surface-variant flex items-center justify-center font-label-mono text-xs">01</div>
+<span class="font-label-mono text-[11px] hidden xl:block uppercase">Sequence Input</span>
+</div>
+<div class="h-[1px] w-8 bg-border-subtle"></div>
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full border-2 border-primary-fixed-dim flex items-center justify-center font-label-mono text-xs text-primary-fixed-dim bg-primary-fixed-dim/10">02</div>
+<span class="font-label-mono text-[11px] uppercase text-on-surface">ESMFold Integration</span>
+</div>
+<div class="h-[1px] w-8 bg-border-subtle"></div>
+<div class="flex items-center gap-2 opacity-40">
+<div class="w-8 h-8 rounded-full border border-on-surface-variant flex items-center justify-center font-label-mono text-xs">03</div>
+<span class="font-label-mono text-[11px] hidden xl:block uppercase">Docking Simulation</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-gutter h-[calc(100vh-200px)]">
+<!-- Left Controls Panel -->
+<div class="col-span-12 lg:col-span-3 flex flex-col gap-gutter overflow-y-auto pr-2">
+<!-- Model Selection Card -->
+<section class="p-5 bg-surface-container rounded border border-border-subtle">
+<h3 class="font-label-mono text-label-mono uppercase text-on-surface-variant mb-4">Model Provider</h3>
+<div class="space-y-3">
+<div class="p-3 bg-surface-bright border border-neon-blue/40 rounded flex items-center justify-between cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-neon-blue"></div>
+<span class="font-body-md font-medium">Meta AI ESMFold</span>
+</div>
+<span class="material-symbols-outlined text-neon-blue text-[18px]">check_circle</span>
+</div>
+<div class="p-3 bg-surface-container-high border border-transparent hover:border-border-subtle rounded flex items-center justify-between cursor-pointer opacity-50 grayscale hover:grayscale-0 transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-on-surface-variant"></div>
+<span class="font-body-md font-medium">AlphaFold 2.3</span>
+</div>
+</div>
+<div class="p-3 bg-surface-container-high border border-transparent hover:border-border-subtle rounded flex items-center justify-between cursor-pointer opacity-50 grayscale hover:grayscale-0 transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-on-surface-variant"></div>
+<span class="font-body-md font-medium">RoseTTAFold</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Visualization Settings -->
+<section class="p-5 bg-surface-container rounded border border-border-subtle">
+<h3 class="font-label-mono text-label-mono uppercase text-on-surface-variant mb-4">Visual Presets</h3>
+<div class="space-y-4">
+<div>
+<label class="font-label-mono text-[10px] text-on-surface-variant uppercase mb-2 block">Color Scheme</label>
+<select class="w-full bg-surface-base border border-border-subtle text-on-surface font-label-mono text-xs py-2 px-3 rounded focus:outline-none focus:border-neon-blue transition-colors appearance-none">
+<option>pLDDT Confidence</option>
+<option>Rainbow (N-to-C)</option>
+<option>Hydrophobicity</option>
+<option>Secondary Structure</option>
+</select>
+</div>
+<div>
+<label class="font-label-mono text-[10px] text-on-surface-variant uppercase mb-2 block">Render Style</label>
+<div class="grid grid-cols-2 gap-2">
+<button class="py-2 bg-surface-bright border border-border-subtle font-label-mono text-[10px] uppercase">Ribbon</button>
+<button class="py-2 bg-surface-base border border-border-subtle text-on-surface-variant font-label-mono text-[10px] uppercase hover:bg-surface-bright">Surface</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Sequence Preview -->
+<section class="p-5 bg-surface-container rounded border border-border-subtle flex-1 min-h-[200px]">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-label-mono text-label-mono uppercase text-on-surface-variant">Target Sequence</h3>
+<span class="font-label-mono text-[10px] text-neon-green">LEN: 428aa</span>
+</div>
+<div class="bg-surface-base p-3 rounded font-label-mono text-[11px] leading-relaxed break-all border border-border-subtle h-[220px] overflow-y-auto text-on-surface-variant">
+                        MTVGKSSKMLQHIDYRMRCILQDGRIFIGTFKA... <br/><br/>
+<div class="protein-sequence-grid mt-2">
+<!-- Mock sequence visualization -->
+<div class="h-4 bg-neon-green/80 rounded-sm"></div>
+<div class="h-4 bg-neon-green/80 rounded-sm"></div>
+<div class="h-4 bg-neon-green/60 rounded-sm"></div>
+<div class="h-4 bg-neon-green/80 rounded-sm"></div>
+<div class="h-4 bg-neon-green/90 rounded-sm"></div>
+<div class="h-4 bg-neon-blue/80 rounded-sm"></div>
+<div class="h-4 bg-neon-blue/40 rounded-sm"></div>
+<div class="h-4 bg-neon-blue/60 rounded-sm"></div>
+<div class="h-4 bg-neon-green/80 rounded-sm"></div>
+<div class="h-4 bg-neon-green/80 rounded-sm"></div>
+<div class="h-4 bg-neon-green/80 rounded-sm"></div>
+<div class="h-4 bg-neon-green/40 rounded-sm"></div>
+<div class="h-4 bg-neon-green/80 rounded-sm"></div>
+<div class="h-4 bg-neon-green/80 rounded-sm"></div>
+<div class="h-4 bg-neon-green/60 rounded-sm"></div>
+<div class="h-4 bg-neon-green/80 rounded-sm"></div>
+<div class="h-4 bg-neon-green/90 rounded-sm"></div>
+<div class="h-4 bg-neon-blue/80 rounded-sm"></div>
+<div class="h-4 bg-neon-blue/40 rounded-sm"></div>
+<div class="h-4 bg-neon-blue/60 rounded-sm"></div>
+<div class="h-4 bg-neon-green/80 rounded-sm"></div>
+<div class="h-4 bg-neon-green/80 rounded-sm"></div>
+<div class="h-4 bg-neon-green/80 rounded-sm"></div>
+<div class="h-4 bg-neon-green/40 rounded-sm"></div>
+</div>
+<p class="mt-4 opacity-50 italic">Full sequence truncated for preview. Use Export for FASTA.</p>
+</div>
+</section>
+</div>
+<!-- Central 3D Viewport -->
+<div class="col-span-12 lg:col-span-9 relative bg-surface-container-lowest rounded border border-border-subtle overflow-hidden group">
+<!-- Viewport Background / Placeholder for 3D Engine -->
+<div class="absolute inset-0 z-0">
+
+<div class="absolute inset-0 flex items-center justify-center">
+<img class="w-3/4 h-3/4 object-contain opacity-90 drop-shadow-[0_0_30px_rgba(0,228,113,0.2)]" data-alt="A highly detailed 3D scientific visualization of a complex protein structure, rendered with vibrant neon green and cyan tones against a deep charcoal background. The protein is shown in a ribbon model style with smooth, glossy surfaces. The lighting is dramatic, highlighting the molecular folds and secondary structures with high-precision detail. The background features subtle, out-of-focus digital data points and micro-borders typical of a high-end MLOps dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsXGfoa9Lm_AOj0u1sd_mr_K19gdHQjjz2KaaEvgob6z40bQsolx01EtyuGZaye8DNjg_XgFE-pAu6VYylWP8XhIZkRnmf2q0J6TLRvanOD_1_skhDSqonOKgN6NN75jXFAwko0idQxbhDYlvbZVwn-yK7WfYfxuqwpKTMC67zMfDpSAG0VjUFqHWXpzkAAgLqb9pW5PhvapU8CKhh2-2oyZGCP3tlLFH5jktXXS5yEiwTVWCRWdDwiU0ucqU78OT9yBPfnwX2-cs"/>
+</div>
+</div>
+<!-- Viewport Overlays -->
+<div class="absolute top-4 left-4 z-10 flex gap-2">
+<div class="bg-surface-container-high/80 backdrop-blur-md px-3 py-1.5 border border-border-subtle rounded flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-neon-blue"></span>
+<span class="font-label-mono text-[10px] text-on-surface tracking-tighter">RENDER: WEBGL 2.0</span>
+</div>
+<div class="w-[1px] h-3 bg-border-subtle"></div>
+<div class="flex items-center gap-1.5">
+<span class="font-label-mono text-[10px] text-on-surface-variant">FPS: 120.4</span>
+</div>
+</div>
+</div>
+<div class="absolute top-4 right-4 z-10 flex flex-col gap-2">
+<button class="w-10 h-10 bg-surface-container-high/80 backdrop-blur-md border border-border-subtle flex items-center justify-center hover:bg-neon-blue hover:text-surface-base transition-all group">
+<span class="material-symbols-outlined">zoom_in</span>
+</button>
+<button class="w-10 h-10 bg-surface-container-high/80 backdrop-blur-md border border-border-subtle flex items-center justify-center hover:bg-neon-blue hover:text-surface-base transition-all">
+<span class="material-symbols-outlined">zoom_out</span>
+</button>
+<button class="w-10 h-10 bg-surface-container-high/80 backdrop-blur-md border border-border-subtle flex items-center justify-center hover:bg-neon-blue hover:text-surface-base transition-all">
+<span class="material-symbols-outlined">refresh</span>
+</button>
+<button class="w-10 h-10 bg-surface-container-high/80 backdrop-blur-md border border-border-subtle flex items-center justify-center hover:bg-neon-blue hover:text-surface-base transition-all">
+<span class="material-symbols-outlined">photo_camera</span>
+</button>
+</div>
+<!-- pLDDT Legend Overlay -->
+<div class="absolute bottom-4 left-4 z-10 p-4 bg-surface-container-high/80 backdrop-blur-md border border-border-subtle rounded w-64">
+<span class="font-label-mono text-[10px] text-on-surface-variant uppercase mb-3 block">pLDDT Confidence Scale</span>
+<div class="h-2 w-full bg-gradient-to-r from-data-error via-amber-400 via-cyan-400 to-neon-green rounded-full mb-2"></div>
+<div class="flex justify-between font-label-mono text-[9px] text-on-surface-variant">
+<span>0 (Low)</span>
+<span>50</span>
+<span>100 (High)</span>
+</div>
+</div>
+<!-- Action Controls Overlay -->
+<div class="absolute bottom-4 right-4 z-10 flex gap-3">
+<button class="px-6 py-2.5 bg-surface-container-high/80 backdrop-blur-md border border-border-subtle font-bold text-xs uppercase tracking-widest hover:border-neon-blue transition-all">
+                        Export PDB
+                    </button>
+<button class="px-8 py-2.5 bg-on-surface text-surface-base font-bold text-xs uppercase tracking-widest hover:bg-neon-blue transition-all flex items-center gap-2">
+                        Next Stage
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+<!-- Interaction Hint -->
+<div class="absolute inset-x-0 bottom-6 flex justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+<div class="bg-surface-base/60 backdrop-blur px-4 py-2 rounded-full border border-border-subtle flex items-center gap-3">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">mouse</span>
+<span class="font-label-mono text-[10px] text-on-surface-variant uppercase">Left-click to rotate • Right-click to pan • Scroll to zoom</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interaction: Subtle parallax effect on viewport image
+        const viewport = document.querySelector('.col-span-12.lg\\:col-span-9');
+        const proteinImg = viewport.querySelector('img');
+
+        viewport.addEventListener('mousemove', (e) => {
+            const { width, height, left, top } = viewport.getBoundingClientRect();
+            const x = (e.clientX - left) / width - 0.5;
+            const y = (e.clientY - top) / height - 0.5;
+
+            proteinImg.style.transform = `translate(${x * 20}px, ${y * 20}px) scale(1.05)`;
+        });
+
+        viewport.addEventListener('mouseleave', () => {
+            proteinImg.style.transform = `translate(0px, 0px) scale(1)`;
+        });
+    </script>
+</body></html>

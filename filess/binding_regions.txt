@@ -1,0 +1,9 @@
+Binding regions for RUNX1:
+259-268
+Binding regions for TGIF1:
+304-310
+1044-1050
+Binding regions for IKZF1:
+455-462
+561-568
+798-805

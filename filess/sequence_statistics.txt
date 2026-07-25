@@ -1,0 +1,2 @@
+Number of bases: 1380
+Percentage of CG: 40.80%

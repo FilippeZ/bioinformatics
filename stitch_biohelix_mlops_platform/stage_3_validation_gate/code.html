@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BioHelix | Target Validation Gate</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Hanken+Grotesk:wght@500;600;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&amp;family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#3a3939",
+                    "primary-fixed-dim": "#00e471",
+                    "inverse-primary": "#006d33",
+                    "surface-container": "#201f1f",
+                    "tertiary": "#fffafb",
+                    "surface-base": "#0A0A0A",
+                    "secondary-fixed-dim": "#00daf8",
+                    "data-error": "#FF3B30",
+                    "surface-tint": "#00e471",
+                    "on-secondary-container": "#005f6d",
+                    "outline-variant": "#3b4b3c",
+                    "inverse-on-surface": "#313030",
+                    "border-subtle": "#222222",
+                    "error-container": "#93000a",
+                    "tertiary-fixed": "#efdbff",
+                    "on-surface-variant": "#b9cbb8",
+                    "neon-blue": "#00E0FF",
+                    "outline": "#849584",
+                    "inverse-surface": "#e5e2e1",
+                    "on-secondary": "#00363f",
+                    "tertiary-container": "#edd6ff",
+                    "on-secondary-fixed": "#001f25",
+                    "surface-raised": "#141414",
+                    "secondary": "#b9f1ff",
+                    "on-tertiary-fixed": "#2c0051",
+                    "on-surface": "#e5e2e1",
+                    "on-primary-fixed-variant": "#005224",
+                    "tertiary-fixed-dim": "#dcb8ff",
+                    "primary-fixed": "#63ff93",
+                    "on-background": "#e5e2e1",
+                    "on-tertiary-fixed-variant": "#6700b5",
+                    "surface-container-high": "#2a2a2a",
+                    "primary": "#f0ffed",
+                    "secondary-fixed": "#a5eeff",
+                    "secondary-container": "#00e0ff",
+                    "surface-container-low": "#1c1b1b",
+                    "neon-green": "#00FF7F",
+                    "on-secondary-fixed-variant": "#004e5a",
+                    "surface-container-lowest": "#0e0e0e",
+                    "on-primary": "#003917",
+                    "background": "#131313",
+                    "surface": "#131313",
+                    "primary-container": "#00ff7f",
+                    "on-tertiary": "#480081",
+                    "on-primary-container": "#007134",
+                    "error": "#ffb4ab",
+                    "surface-variant": "#353534",
+                    "on-error-container": "#ffdad6",
+                    "on-tertiary-container": "#8828e0",
+                    "text-muted": "#888888",
+                    "surface-container-highest": "#353534",
+                    "on-primary-fixed": "#00210b",
+                    "surface-dim": "#131313",
+                    "on-error": "#690005"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "unit": "4px",
+                    "margin-desktop": "32px",
+                    "margin-mobile": "16px",
+                    "container-max": "1440px"
+            },
+            "fontFamily": {
+                    "label-mono": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "data-tabular": ["JetBrains Mono"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-mono": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                    "data-tabular": ["13px", {"lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .heatmap-cell {
+            aspect-ratio: 1;
+            transition: all 0.2s ease;
+        }
+        .heatmap-cell:hover {
+            transform: scale(1.1);
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(0, 228, 113, 0.5);
+        }
+        .glass-panel {
+            background: rgba(32, 31, 31, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid #222222;
+        }
+        .stepper-line {
+            height: 2px;
+            background: #222222;
+            flex-grow: 1;
+        }
+        .stepper-line.active {
+            background: #00e471;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0A0A0A; }
+        ::-webkit-scrollbar-thumb { background: #3a3939; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #849584; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-margin-desktop h-14 w-full z-50 bg-surface-base border-b border-border-subtle fixed top-0">
+<div class="flex items-center gap-8">
+<span class="font-headline-md text-headline-md font-bold text-on-surface tracking-tighter">BioHelix</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200" href="#">Dashboard</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200" href="#">Workspaces</a>
+<a class="text-primary-fixed-dim font-bold border-b-2 border-primary-fixed-dim pb-1" href="#">Experiments</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200" href="#">Compute</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200" href="#">Registry</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed-dim">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed-dim">settings</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed-dim">help</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-border-subtle overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional close-up headshot of a bioinformatics researcher in a dark tech-focused environment. The lighting is cold and precise with subtle green lens flares. High contrast, sharp focus, 8k resolution, minimalist cinematic style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsBSQUfFerQmS4hfC-OrFEY2gxd10WnQmra91Ywy0prDOQC96tT3yydbjtNIIEPihpoHyMPJ7Bpv0I9-xnpGOEoyM4_TTlcMNha3Z1vpZjNWBlFK9z6zFioWDusYeAYkcQuFekPC99-pCNJMaOseYcQYMzCZrA9eN92U7pf1NC4Lh4K6xULY90LFZ-x5kJw6fHFNPy7JZSFvmsSAeSGCXWw8q5gH5RkKbtNb5_lgwamGQ-v4gyMc_8NAWKAVQw8BQhaAWMHd-oWKQ"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-14 bottom-0 flex flex-col w-64 z-40 bg-surface-container border-r border-border-subtle hidden lg:flex">
+<div class="p-4 border-b border-border-subtle">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-neon-blue/20 border border-neon-blue rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-neon-blue text-sm" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<div>
+<h3 class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant">Session Nodes</h3>
+<p class="text-[10px] text-neon-blue font-label-mono">RTX-4090-Cluster-A</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto py-2">
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high py-3 px-4 transition-all" href="#">
+<span class="material-symbols-outlined text-on-surface-variant">monitoring</span>
+<span class="font-label-mono text-label-mono">Telemetry</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high py-3 px-4 transition-all" href="#">
+<span class="material-symbols-outlined text-on-surface-variant">terminal</span>
+<span class="font-label-mono text-label-mono">MLflow Logs</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high py-3 px-4 transition-all" href="#">
+<span class="material-symbols-outlined text-on-surface-variant">memory</span>
+<span class="font-label-mono text-label-mono">Memory Usage</span>
+</a>
+<a class="bg-surface-bright text-neon-blue border-l-2 border-neon-blue font-bold py-3 px-4 flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">developer_board</span>
+<span class="font-label-mono text-label-mono">GPU Metrics</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high py-3 px-4 transition-all" href="#">
+<span class="material-symbols-outlined text-on-surface-variant">query_stats</span>
+<span class="font-label-mono text-label-mono">Weights</span>
+</a>
+</nav>
+<div class="p-4 border-t border-border-subtle mt-auto">
+<button class="w-full bg-surface-base border border-border-subtle text-on-surface py-2 font-label-mono text-label-mono hover:bg-surface-container-highest transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">refresh</span>
+                Restart Kernel
+            </button>
+<div class="mt-4 flex flex-col gap-2">
+<a class="flex items-center gap-3 text-[11px] text-on-surface-variant font-label-mono hover:text-on-surface" href="#">
+<span class="material-symbols-outlined text-sm">menu_book</span> Documentation
+                </a>
+<a class="flex items-center gap-3 text-[11px] text-on-surface-variant font-label-mono hover:text-on-surface" href="#">
+<span class="material-symbols-outlined text-sm">support_agent</span> Support
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-0 lg:ml-64 pt-14 p-6 bg-surface-base">
+<!-- Workflow Stepper -->
+<div class="max-w-container-max mx-auto mb-8 px-4">
+<div class="flex items-center justify-between gap-4">
+<div class="flex items-center gap-3 group cursor-pointer">
+<div class="w-8 h-8 rounded-full border border-primary-fixed-dim flex items-center justify-center bg-primary-fixed-dim/10 text-primary-fixed-dim">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="font-label-mono text-label-mono text-on-surface-variant">Stage 1: Ingestion</span>
+</div>
+<div class="stepper-line active"></div>
+<div class="flex items-center gap-3 group cursor-pointer">
+<div class="w-8 h-8 rounded-full border border-primary-fixed-dim flex items-center justify-center bg-primary-fixed-dim/10 text-primary-fixed-dim">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="font-label-mono text-label-mono text-on-surface-variant">Stage 2: Processing</span>
+</div>
+<div class="stepper-line active"></div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full border-2 border-neon-blue flex items-center justify-center bg-neon-blue/20 text-neon-blue shadow-[0_0_15px_rgba(0,224,255,0.4)]">
+<span class="font-label-mono text-sm font-bold">03</span>
+</div>
+<span class="font-label-mono text-label-mono text-on-surface font-bold">Stage 3: Validation Gate</span>
+</div>
+<div class="stepper-line"></div>
+<div class="flex items-center gap-3 opacity-40">
+<div class="w-8 h-8 rounded-full border border-border-subtle flex items-center justify-center text-on-surface-variant">
+<span class="font-label-mono text-sm">04</span>
+</div>
+<span class="font-label-mono text-label-mono text-on-surface-variant">Stage 4: Synthesis</span>
+</div>
+</div>
+</div>
+<!-- Validation Banner -->
+<div class="max-w-container-max mx-auto mb-6">
+<div class="bg-primary-fixed-dim/5 border border-primary-fixed-dim/30 p-4 flex items-center justify-between rounded shadow-[inset_0_0_20px_rgba(0,228,113,0.05)]">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-fixed-dim flex items-center justify-center animate-pulse">
+<span class="material-symbols-outlined text-on-primary-fixed font-bold">verified</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-primary-fixed-dim leading-none">Validation Passed</h1>
+<p class="text-on-surface-variant font-body-md mt-1">Target consistency score: 0.982. Genomic markers aligned within tolerance.</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="text-right px-4 border-r border-border-subtle">
+<div class="text-[10px] uppercase text-on-surface-variant font-label-mono tracking-widest">Confidence</div>
+<div class="font-label-mono text-xl text-on-surface">99.4%</div>
+</div>
+<button class="bg-primary-fixed-dim text-on-primary-fixed px-6 py-2 rounded-sm font-label-mono text-label-mono font-bold hover:brightness-110 active:scale-95 transition-all">
+                        PROCEED TO SYNTHESIS
+                    </button>
+</div>
+</div>
+</div>
+<!-- Main Grid Layout -->
+<div class="max-w-container-max mx-auto grid grid-cols-12 gap-6">
+<!-- Left Column: Workspace Configuration -->
+<div class="col-span-12 lg:col-span-3 space-y-6">
+<div class="glass-panel p-5 rounded">
+<h2 class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant border-b border-border-subtle pb-3 mb-4">Sequence Parameters</h2>
+<div class="space-y-4">
+<div>
+<label class="block font-label-mono text-[10px] text-on-surface-variant mb-2 uppercase tracking-tighter">Match Score</label>
+<div class="flex items-center gap-2">
+<input class="w-full accent-neon-blue" max="10" min="1" type="range" value="5"/>
+<span class="font-label-mono text-sm text-neon-blue">5.0</span>
+</div>
+</div>
+<div>
+<label class="block font-label-mono text-[10px] text-on-surface-variant mb-2 uppercase tracking-tighter">Mismatch Penalty</label>
+<div class="flex items-center gap-2">
+<input class="w-full accent-data-error" max="0" min="-10" type="range" value="-3"/>
+<span class="font-label-mono text-sm text-data-error">-3.0</span>
+</div>
+</div>
+<div>
+<label class="block font-label-mono text-[10px] text-on-surface-variant mb-2 uppercase tracking-tighter">Gap Opening</label>
+<div class="flex items-center gap-2">
+<input class="w-full accent-on-surface" max="0" min="-20" type="range" value="-10"/>
+<span class="font-label-mono text-sm text-on-surface">-10.0</span>
+</div>
+</div>
+<div class="pt-4 border-t border-border-subtle mt-4">
+<button class="w-full bg-surface-bright border border-neon-blue/50 text-neon-blue py-3 rounded-sm font-label-mono text-label-mono hover:bg-neon-blue/10 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,224,255,0.1)]" id="evaluateBtn">
+<span class="material-symbols-outlined text-sm">analytics</span>
+                                EVALUATE SEQUENCE
+                            </button>
+</div>
+</div>
+</div>
+<div class="glass-panel p-5 rounded">
+<h2 class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant border-b border-border-subtle pb-3 mb-4">Model Config</h2>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-xs font-label-mono">
+<span class="text-on-surface-variant">Arch:</span>
+<span class="text-on-surface">CNN-Transformer</span>
+</div>
+<div class="flex justify-between items-center text-xs font-label-mono">
+<span class="text-on-surface-variant">Weights:</span>
+<span class="text-on-surface">BioBert-V4-Stable</span>
+</div>
+<div class="flex justify-between items-center text-xs font-label-mono">
+<span class="text-on-surface-variant">One-Hot:</span>
+<div class="w-3 h-3 rounded-full bg-neon-green shadow-[0_0_5px_rgba(0,255,127,1)]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Middle/Right Columns: Diagnostic View -->
+<div class="col-span-12 lg:col-span-9">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+<!-- Left Pane: Alignment Matrix Heatmap -->
+<div class="glass-panel p-5 rounded flex flex-col">
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant">Alignment Matrix</h2>
+<span class="text-[10px] font-label-mono px-2 py-0.5 border border-border-subtle bg-surface-base text-on-surface-variant rounded">Smith-Waterman</span>
+</div>
+<div class="flex-1 grid grid-cols-10 grid-rows-10 gap-0.5 p-2 bg-surface-lowest border border-border-subtle relative">
+<!-- Matrix Cells -->
+<script>
+                                const parent = document.currentScript.parentElement;
+                                for(let i=0; i<100; i++) {
+                                    const opacity = Math.random();
+                                    const colorClass = opacity > 0.8 ? 'bg-primary-fixed-dim' : 
+                                                      opacity > 0.5 ? 'bg-primary-fixed-dim/40' :
+                                                      opacity > 0.2 ? 'bg-primary-fixed-dim/10' : 'bg-surface-container';
+                                    const cell = document.createElement('div');
+                                    cell.className = `heatmap-cell ${colorClass} cursor-crosshair`;
+                                    parent.appendChild(cell);
+                                }
+                            </script>
+<!-- Matrix Labels -->
+<div class="absolute -left-6 top-0 bottom-0 flex flex-col justify-between py-2 text-[8px] font-label-mono text-on-surface-variant pointer-events-none">
+<span>A</span><span>G</span><span>C</span><span>T</span><span>A</span><span>A</span><span>G</span><span>C</span><span>T</span><span>T</span>
+</div>
+<div class="absolute -top-6 left-0 right-0 flex justify-between px-2 text-[8px] font-label-mono text-on-surface-variant pointer-events-none">
+<span>A</span><span>T</span><span>G</span><span>C</span><span>A</span><span>G</span><span>G</span><span>T</span><span>A</span><span>C</span>
+</div>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<div class="flex gap-2 items-center">
+<span class="text-[10px] font-label-mono text-on-surface-variant">Low</span>
+<div class="h-2 w-24 bg-gradient-to-r from-surface-container to-primary-fixed-dim rounded-full"></div>
+<span class="text-[10px] font-label-mono text-on-surface-variant">High</span>
+</div>
+<button class="text-[10px] font-label-mono text-neon-blue hover:underline">Download CSV</button>
+</div>
+</div>
+<!-- Right Pane: ML Classification results -->
+<div class="glass-panel p-5 rounded flex flex-col">
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant">One-Hot ML Classification</h2>
+<div class="flex items-center gap-1">
+<span class="text-[10px] font-label-mono text-primary-fixed-dim">LIVE</span>
+<div class="w-1 h-1 rounded-full bg-primary-fixed-dim animate-ping"></div>
+</div>
+</div>
+<div class="flex-1 space-y-6">
+<!-- Classification Items -->
+<div class="space-y-4">
+<div>
+<div class="flex justify-between items-end mb-1">
+<span class="font-label-mono text-xs text-on-surface">Target Motif-Alpha</span>
+<span class="font-label-mono text-xs text-primary-fixed-dim">0.992</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary-fixed-dim shadow-[0_0_8px_rgba(0,228,113,0.5)]" style="width: 99.2%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-1">
+<span class="font-label-mono text-xs text-on-surface">Promoter Site B</span>
+<span class="font-label-mono text-xs text-primary-fixed-dim">0.941</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary-fixed-dim shadow-[0_0_8px_rgba(0,228,113,0.5)]" style="width: 94.1%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-1">
+<span class="font-label-mono text-xs text-on-surface">Intron Junctions</span>
+<span class="font-label-mono text-xs text-secondary-fixed-dim">0.124</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim/40" style="width: 12.4%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-1">
+<span class="font-label-mono text-xs text-on-surface">Anomalous Spike</span>
+<span class="font-label-mono text-xs text-data-error">0.003</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-data-error" style="width: 3%"></div>
+</div>
+</div>
+</div>
+<!-- Data Visualization (Radar/Spider Sim) -->
+<div class="relative w-full aspect-video flex items-center justify-center border border-border-subtle/50 rounded bg-surface-lowest/30 overflow-hidden">
+<div class="absolute inset-0 opacity-10">
+
+</div>
+<div class="relative z-10 text-center">
+<div class="material-symbols-outlined text-4xl text-neon-blue mb-2" style="font-variation-settings: 'FILL' 1;">insights</div>
+<div class="font-label-mono text-[10px] text-on-surface-variant tracking-widest uppercase">Feature Engineering Profile</div>
+<div class="font-label-mono text-lg text-neon-blue">STABLE_VALID</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer / Global Stats -->
+<div class="max-w-container-max mx-auto mt-6 pt-6 border-t border-border-subtle flex flex-wrap justify-between items-center gap-4 text-on-surface-variant font-label-mono text-[11px]">
+<div class="flex gap-6">
+<span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary-fixed-dim"></span> SYSTEM NOMINAL</span>
+<span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-neon-blue"></span> LATENCY: 24ms</span>
+<span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-surface-container-high"></span> WORKER: #8821-X</span>
+</div>
+<div class="flex gap-4">
+<span class="uppercase">BioHelix v2.4.12-Final</span>
+<span class="text-on-surface">0x449F...882C</span>
+</div>
+</div>
+</main>
+<!-- Interactions Script -->
+<script>
+        document.getElementById('evaluateBtn').addEventListener('click', function() {
+            const btn = this;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">sync</span> COMPUTING...';
+            btn.classList.add('opacity-80', 'scale-95');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.classList.remove('opacity-80', 'scale-95');
+                // Simulate refresh or success
+                const cells = document.querySelectorAll('.heatmap-cell');
+                cells.forEach(cell => {
+                    const opacity = Math.random();
+                    cell.style.backgroundColor = opacity > 0.8 ? '#00e471' : 
+                                                opacity > 0.5 ? 'rgba(0, 228, 113, 0.4)' :
+                                                opacity > 0.2 ? 'rgba(0, 228, 113, 0.1)' : '#201f1f';
+                });
+            }, 1200);
+        });
+
+        // Add subtle mouse tracking for atmospheric light
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+            // Potentially add a cursor spotlight here if desired
+        });
+    </script>
+</body></html>
