@@ -89,40 +89,64 @@ function generateDynamicPdbBackbone(sequence: string): string {
     'S': 'SER', 'T': 'THR', 'W': 'TRP', 'Y': 'TYR', 'V': 'VAL'
   };
 
-  let atomIdx = 1;
+  let serial = 1;
   const radius = 5.0;
   const pitch = 1.5;
+
+  const formatAtom = (
+    idx: number,
+    atomName: string,
+    resName: string,
+    chain: string,
+    resNum: number,
+    x: number,
+    y: number,
+    z: number,
+    bFactor = 92.50,
+    element = ''
+  ) => {
+    const paddedSerial = idx.toString().padStart(5, ' ');
+    const formattedAtomName = atomName.length === 1 ? ` ${atomName}  ` : atomName.length === 2 ? ` ${atomName} ` : atomName.padStart(4, ' ');
+    const paddedResName = resName.padEnd(3, ' ');
+    const paddedResNum = resNum.toString().padStart(4, ' ');
+    const strX = x.toFixed(3).padStart(8, ' ');
+    const strY = y.toFixed(3).padStart(8, ' ');
+    const strZ = z.toFixed(3).padStart(8, ' ');
+    const strB = bFactor.toFixed(2).padStart(6, ' ');
+    const elem = (element || atomName[0]).padStart(2, ' ');
+
+    return `ATOM  ${paddedSerial} ${formattedAtomName} ${paddedResName} ${chain}${paddedResNum}    ${strX}${strY}${strZ}  1.00${strB}          ${elem}\n`;
+  };
 
   for (let i = 0; i < sequence.length; i++) {
     const aaOne = sequence[i] || 'A';
     const aaThree = aaThreeLetter[aaOne] || 'ALA';
     const resNum = i + 1;
     const angle = i * (2 * Math.PI / 3.6);
+    const z = i * pitch;
 
-    const caX = (radius * Math.cos(angle)).toFixed(3);
-    const caY = (radius * Math.sin(angle)).toFixed(3);
-    const caZ = (i * pitch).toFixed(3);
+    const caX = radius * Math.cos(angle);
+    const caY = radius * Math.sin(angle);
+    const caZ = z;
 
-    const nX = (radius * Math.cos(angle - 0.2)).toFixed(3);
-    const nY = (radius * Math.sin(angle - 0.2)).toFixed(3);
-    const nZ = (i * pitch - 0.5).toFixed(3);
+    const nX = radius * Math.cos(angle - 0.25);
+    const nY = radius * Math.sin(angle - 0.25);
+    const nZ = z - 0.5;
 
-    const cX = (radius * Math.cos(angle + 0.2)).toFixed(3);
-    const cY = (radius * Math.sin(angle + 0.2)).toFixed(3);
-    const cZ = (i * pitch + 0.5).toFixed(3);
+    const cX = radius * Math.cos(angle + 0.25);
+    const cY = radius * Math.sin(angle + 0.25);
+    const cZ = z + 0.5;
 
-    const oX = ((radius + 1.2) * Math.cos(angle + 0.2)).toFixed(3);
-    const oY = ((radius + 1.2) * Math.sin(angle + 0.2)).toFixed(3);
-    const oZ = (i * pitch + 0.5).toFixed(3);
+    const oX = (radius + 1.2) * Math.cos(angle + 0.25);
+    const oY = (radius + 1.2) * Math.sin(angle + 0.25);
+    const oZ = z + 0.5;
 
-    pdbLines += `ATOM  ${atomIdx.toString().padStart(5, ' ')}  N   ${aaThree} A${resNum.toString().padStart(4, ' ')}    ${nX.padStart(8, ' ')}${nY.padStart(8, ' ')}${nZ.padStart(8, ' ')}  1.00 92.50           N\n`;
-    atomIdx++;
-    pdbLines += `ATOM  ${atomIdx.toString().padStart(5, ' ')}  CA  ${aaThree} A${resNum.toString().padStart(4, ' ')}    ${caX.padStart(8, ' ')}${caY.padStart(8, ' ')}${caZ.padStart(8, ' ')}  1.00 92.50           C\n`;
-    atomIdx++;
-    pdbLines += `ATOM  ${atomIdx.toString().padStart(5, ' ')}  C   ${aaThree} A${resNum.toString().padStart(4, ' ')}    ${cX.padStart(8, ' ')}${cY.padStart(8, ' ')}${cZ.padStart(8, ' ')}  1.00 92.50           C\n`;
-    atomIdx++;
-    pdbLines += `ATOM  ${atomIdx.toString().padStart(5, ' ')}  O   ${aaThree} A${resNum.toString().padStart(4, ' ')}    ${oX.padStart(8, ' ')}${oY.padStart(8, ' ')}${oZ.padStart(8, ' ')}  1.00 92.50           O\n`;
-    atomIdx++;
+    const plddt = 88.0 + (Math.sin(i * 0.4) * 7.5);
+
+    pdbLines += formatAtom(serial++, 'N',  aaThree, 'A', resNum, nX,  nY,  nZ,  plddt, 'N');
+    pdbLines += formatAtom(serial++, 'CA', aaThree, 'A', resNum, caX, caY, caZ, plddt, 'C');
+    pdbLines += formatAtom(serial++, 'C',  aaThree, 'A', resNum, cX,  cY,  cZ,  plddt, 'C');
+    pdbLines += formatAtom(serial++, 'O',  aaThree, 'A', resNum, oX,  oY,  oZ,  plddt, 'O');
   }
 
   pdbLines += `END\n`;

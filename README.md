@@ -1,133 +1,279 @@
-# 🧬 BioPipeline — End-to-End Computational Drug Discovery Platform
+<div align="center">
 
-> **An Advanced MLOps & Bioinformatics Platform** integrating algorithmic genomics, zero-shot AI 3D protein structure prediction (Meta ESMFold), dynamic programming sequence alignment, cheminformatics (Lipinski Rule of 5), and machine learning QSAR drug-activity prediction.
+<img src="docs/biohelix_logo.png" alt="BioHelix Logo" width="480" />
+
+# BioHelix — AI-Powered Computational Drug Discovery Pipeline
+
+**From DNA to Drug Candidate in 5 Guided Steps**
+
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white&style=for-the-badge)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white&style=for-the-badge)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white&style=for-the-badge)](https://vitejs.dev/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3-06B6D4?logo=tailwindcss&logoColor=white&style=for-the-badge)](https://tailwindcss.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
+> **A fully interactive, browser-based computational biology platform** that replicates real pharmaceutical research workflows — powered by AI and designed for everyone, from students to scientists.
 
 ---
 
-## 🌟 Overview
+</div>
 
-**BioPipeline** bridges classical bioinformatics algorithms with state-of-the-art Machine Learning (ML) and Artificial Intelligence (AI) to form an end-to-end **Computational Drug Discovery (In Silico / Rational Drug Design)** pipeline.
+## 🌐 Live Pipeline Overview
 
-The platform takes raw genomic DNA input, identifies target genes, models their 3D protein structure, validates target druggability, screens thousands of small molecules against pharmacokinetic rules, and utilizes a Random Forest QSAR ML model to rank top lead drug candidates.
+<div align="center">
+
+### 🛬 Landing Page
+
+![BioHelix Landing Page](docs/screenshots/stage0_landing.png)
+
+*The animated 3D landing page with DNA helix particle field, live status ticker, and guided 5-step pipeline preview*
 
 ---
 
-## 🔬 The 5-Stage Pipeline Architecture
+### 🧬 Step 1 · Read & Decode Your DNA
+
+![Stage 1 — Sequence Analysis](docs/screenshots/stage1_sequence_analysis.png)
+
+*Automatic DNA analysis on launch: suffix tree pattern matching, GC stability score, reading frame translation, and gene motif detection — all explained in plain English*
+
+---
+
+### 🤖 Step 2 · AI 3D Protein Modeling
+
+![Stage 2 — Protein Structure](docs/screenshots/stage2_protein_structure.png)
+
+*Meta AI ESMFold v1 predicts the 3D fold of the target protein. Interactive WebGL viewer (NGL) with pLDDT confidence heatmap, residue count, and downloadable PDB file*
+
+---
+
+### ✅ Step 3 · Drug Target Validation Gate
+
+![Stage 3 — Validation Gate](docs/screenshots/stage3_validation_gate.png)
+
+*Needleman-Wunsch global sequence alignment against 4 known disease genes. Random Forest ML classifier gives a drug-target suitability score (≥ 65% to proceed)*
+
+---
+
+### 🧪 Step 4 · Molecule Safety Screening
+
+![Stage 4 — Cheminformatics](docs/screenshots/stage4_cheminformatics.png)
+
+*Lipinski Rule of 5 filtering across 1,000 FDA-approved compounds. Adjustable pharmacokinetic sliders (MW, LogP, HBD, HBA, TPSA) with live molecule pass/fail table*
+
+---
+
+### 🏆 Step 5 · AI Drug Candidate Ranking
+
+![Stage 5 — QSAR Drug Ranking](docs/screenshots/stage5_drug_ranking_results.png)
+
+*Random Forest QSAR model ranks top-3 lead drug candidates by predicted pIC₅₀ efficacy score, Ki binding affinity, and ΔG binding free energy. Full exportable JSON/TXT report.*
+
+</div>
+
+---
+
+## ✨ Key Features
+
+### 🎯 End-to-End Drug Discovery Pipeline
+- **5 fully connected bioinformatics stages** — each stage feeds real data into the next
+- **Auto-populated on launch** — the default RUNX1 target gene is pre-analyzed; no setup needed
+- **Locked-stage progression** — you must complete each step before proceeding (mimicking real lab validation)
+
+### 🧠 Algorithms Implemented
+| Stage | Algorithm | Description |
+|-------|-----------|-------------|
+| 1 | **Suffix Tree / Boyer-Moore** | Gene motif pattern matching in O(n) time |
+| 1 | **Reading Frame Translation** | 6-frame ORF translation (all 3 forward frames) |
+| 2 | **Meta AI ESMFold v1** | Transformer-based protein structure prediction (API) |
+| 3 | **Needleman-Wunsch DP** | Global sequence alignment with configurable scoring |
+| 3 | **Random Forest Classifier** | Drug-target suitability ML classification |
+| 4 | **Lipinski Rule of 5 + Veber Rules** | ADMET pharmacokinetic molecular filtering |
+| 5 | **Random Forest QSAR Regression** | pIC₅₀ / Ki / ΔG potency prediction from ECFP4 fingerprints |
+
+### 🎨 Premium UI/UX Design
+- **Deep-navy scientific palette** — #050B1A base with indigo/cyan/emerald accents
+- **Contextual help banners** on every step — plain-English explanations for non-experts
+- **Accessible jargon tooltips** — hover over any technical term for an instant definition
+- **Simple / Expert sidebar mode** — beginner-friendly journey tracker OR technical HUD audit log
+- **Animated gradient StepperBar** — per-step accent colors, checkmarks, locked-state indicators
+- **Glassmorphism card design** — backdrop blur, subtle border glow, dark surface layers
+- **Google Fonts** — Inter, Outfit, JetBrains Mono
+
+### 🔬 Interactive 3D Protein Viewer
+- **NGL (WebGL)** molecular visualization with pLDDT confidence heatmap coloring
+- Pre-loaded **Ferritin Light Chain** reference models (A–C variants) from PDB Archive
+- Live ESMFold API integration for real-time ab initio prediction
+- PDB file download
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- **Node.js** ≥ 18
+- **npm** ≥ 9
+
+### Install & Run
+
+```bash
+# Clone the repository
+git clone https://github.com/FilippeZ/bioinformatics.git
+cd bioinformatics/biopipeline-app
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+Open **[http://localhost:5173](http://localhost:5173)** in your browser.
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+The production bundle is output to `biopipeline-app/dist/`.
+
+---
+
+## 🗂️ Project Architecture
 
 ```
-[ Stage 1: Ingestion & Motifs ] ──► [ Stage 2: ESMFold 3D AI ] ──► [ Stage 3: NW Alignment & ML Gate ]
-                                                                               │
-[ Stage 5: QSAR ML Drug Ranking ] ◄── [ Stage 4: Lipinski ADME Filter ] ◄──────┘
+bioinformatics/
+├── biopipeline-app/
+│   ├── public/
+│   │   ├── biohelix_logo.png          ← Official BioHelix logo (transparent PNG)
+│   │   └── images/                    ← Protein frame animation assets
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── common/
+│   │   │   │   ├── Header.tsx         ← App bar with logo, progress bar, stage status
+│   │   │   │   ├── StepperBar.tsx     ← Animated 5-step navigator
+│   │   │   │   ├── Sidebar.tsx        ← Simple/Expert toggle sidebar
+│   │   │   │   ├── ContextHelp.tsx    ← Step-aware plain-English help banner
+│   │   │   │   └── Tooltip.tsx        ← Accessible jargon tooltip component
+│   │   │   ├── landing/
+│   │   │   │   └── LandingPage.tsx    ← Animated 3D landing with DNA helix frames
+│   │   │   ├── modules/
+│   │   │   │   ├── Module1Sequence.tsx      ← DNA analysis & motif detection
+│   │   │   │   ├── Module2Structure.tsx     ← ESMFold 3D protein modeling
+│   │   │   │   ├── Module3Validation.tsx    ← NW alignment & ML target validation
+│   │   │   │   ├── Module4Cheminformatics.tsx ← Lipinski filter screening
+│   │   │   │   └── Module5QSAR.tsx          ← QSAR drug ranking & podium
+│   │   │   └── viewers/
+│   │   │       ├── Protein3DViewer.tsx      ← NGL WebGL 3D viewer
+│   │   │       └── DnaHelixAnimation.tsx    ← CSS DNA helix animation
+│   │   ├── context/
+│   │   │   └── PipelineContext.tsx    ← Global state (Zustand-style React context)
+│   │   ├── lib/algorithms/
+│   │   │   ├── dnaParser.ts           ← Suffix tree, GC%, reading frame translation
+│   │   │   ├── alignment.ts           ← Needleman-Wunsch DP implementation
+│   │   │   ├── lipinskiFilter.ts      ← Lipinski + Veber ADMET rules
+│   │   │   ├── qsarModel.ts           ← Random Forest QSAR regression model
+│   │   │   └── esmFoldApi.ts          ← Meta AI ESMFold API client
+│   │   └── types/
+│   │       └── bio.ts                 ← TypeScript domain types
+│   ├── tailwind.config.js             ← Extended design token palette
+│   └── index.css                      ← Global styles, glassmorphism, fonts
+├── docs/
+│   ├── biohelix_logo.png             ← Logo for README
+│   └── screenshots/                   ← Auto-generated stage screenshots
+├── biohelix_logo.png                  ← Transparent PNG logo (background removed)
+└── _BioHelix_BioPipeline_branding_6.jpg ← Original branding asset
 ```
 
-### 📥 Stage 1: Data Ingestion, Suffix Trees & 6-Frame Translation
-- **GC Content & Sequence Statistics**: Automatic %GC stability analysis.
-- **Motif Pattern Search**: Combines **Generalized Suffix Trees** with **Regex** to locate Transcription Factor (TF) binding sites for **RUNX1**, **TGIF1**, and **IKZF1**.
-- **Transcription & Translation**: Transcribes DNA to mRNA ($5' \rightarrow 3'$) and translates into amino acid chains.
-- **6-Frame Translation**: Translates all 3 forward and 3 reverse-complement reading frames, detecting Open Reading Frames (ORFs $\ge 10$ AA).
+---
 
-### 🧬 Stage 2: Foundation Model 3D Structure Prediction (Meta ESMFold)
-- **Zero-Shot AI 3D Folding**: Connects directly to the **Meta AI ESMFold v1 API** for instant 3D protein structure prediction.
-- **Integrated PDB Assets**: Supports loading pre-computed PDB models from university assignment benchmarks (`6WX6_A`, `AAP36762.1`, `WP_217683847.1`).
-- **Interactive 3D WebGL Viewer**: Rendered with `3Dmol.js` featuring **Ribbon Cartoon**, **Sticks**, and **CPK Spheres** modes, auto-rotation, pLDDT confidence scoring heatmap, and PDB export.
+## 🧬 The Drug Discovery Workflow Explained
 
-### 🛡️ Stage 3: Needleman-Wunsch Alignment & Target Validation Gate
-- **Dynamic Programming Sequence Alignment**: Global **Needleman-Wunsch (NW)** algorithm with customizable Match, Mismatch, and Gap penalty parameters.
-- **Multi-Target Alignment**: Aligns query protein against 4 major disease target families:
-  1. *EGFR Tyrosine Kinase* (Oncology)
-  2. *SARS-CoV-2 Spike S1 Domain* (Virology)
-  3. *TP53 Tumor Suppressor* (Cellular Guardian)
-  4. *KRAS G12D Mutant GTPase* (Pancreatic Cancer Target)
-- **One-Hot ML Classification**: Logistic Regression model assessing hydrophobicity, net charge ratio, and aromatic content to calculate a **Target Validity Score (%)**. Threshold: $\ge 65\%$ unlocks Stage 4.
+BioHelix replicates a **real 5-stage computational drug discovery pipeline** used by pharmaceutical researchers:
 
-### 🧪 Stage 4: Cheminformatics & Lipinski Rule of 5 Filter Engine
-- **ADME Pharmacokinetic Filtering**: Filters 1,000 FDA-approved small molecule compounds (SMILES dataset) against **Lipinski's Rule of Five**:
-  - Molecular Weight ($\text{MW} \le 500\text{ Da}$)
-  - Lipophilicity ($\text{LogP} \le 5.0$)
-  - H-Bond Donors ($\text{HBD} \le 5$)
-  - H-Bond Acceptors ($\text{HBA} \le 10$)
-  - Topological Polar Surface Area ($\text{TPSA} \le 140\text{ \AA}^2$)
-- **Interactive UI**: Real-time ADME sliders, custom SMILES CSV file upload, sample CSV template download, and candidate selection (top $\le 50$ molecules).
+```
+[Your Gene / DNA Sequence]
+         │
+         ▼
+  ┌─────────────────────────────────────────────────────┐
+  │  Step 1: Genomic Analysis                           │
+  │  • Suffix tree motif search                         │
+  │  • GC content & stability assessment                │
+  │  • 6-frame ORF protein translation                  │
+  └───────────────────────┬─────────────────────────────┘
+                          │ Protein Sequence
+                          ▼
+  ┌─────────────────────────────────────────────────────┐
+  │  Step 2: AI 3D Structure Prediction (ESMFold)       │
+  │  • Meta AI Transformer model                        │
+  │  • pLDDT confidence heatmap                         │
+  │  • Interactive WebGL NGL viewer                     │
+  └───────────────────────┬─────────────────────────────┘
+                          │ 3D PDB Structure
+                          ▼
+  ┌─────────────────────────────────────────────────────┐
+  │  Step 3: Drug Target Validation Gate                │
+  │  • Needleman-Wunsch global alignment (DP)           │
+  │  • Random Forest classifier (5 biochemical features)│
+  │  • ≥65% suitability score required to proceed       │
+  └───────────────────────┬─────────────────────────────┘
+                          │ Validated Target
+                          ▼
+  ┌─────────────────────────────────────────────────────┐
+  │  Step 4: Molecular Screening (Lipinski Rule of 5)   │
+  │  • 1,000 FDA-approved + synthetic compounds         │
+  │  • MW, LogP, HBD, HBA, TPSA interactive filters     │
+  │  • Pass/fail ADMET badges + molecule table          │
+  └───────────────────────┬─────────────────────────────┘
+                          │ Filtered Candidates
+                          ▼
+  ┌─────────────────────────────────────────────────────┐
+  │  Step 5: QSAR Drug Ranking (Random Forest)          │
+  │  • ECFP4 Morgan Fingerprints (2048-bit)             │
+  │  • Predicted pIC₅₀, Ki binding affinity, ΔG         │
+  │  • 🥇🥈🥉 Podium of top 3 lead drug candidates      │
+  │  • Exportable JSON + TXT scientific report          │
+  └─────────────────────────────────────────────────────┘
+```
 
-### 🏆 Stage 5: QSAR Machine Learning Predictive Inference & Ranking
-- **Random Forest QSAR Engine**: Pre-trained ensemble model scoring candidates using **2048-bit Morgan Fingerprints** (radius=2) and target-complementarity feature vectors.
-- **Predictive Metrics**:
-  - Predicted $pIC_{50}$ ($-\log_{10} IC_{50}$)
-  - Binding Affinity $K_i$ (nM)
-  - Docking Free Energy $\Delta G$ ($\text{kcal/mol}$)
-  - Drug-Likeness Score ($0 - 100\%$)
-- **Data Visualizations & Export**: Interactive SVG $pIC_{50}$ distribution chart, **Top 3 Lead Candidate Podium Cards**, full predictions table, and downloadable **JSON & TXT Audit Reports**.
+---
+
+## 🎓 Academic Context
+
+This project was developed as part of a **university assignment on Genomic Analysis and Computational Drug Discovery**, implementing the following algorithmic concepts:
+
+- **Suffix Trees** — pattern/motif matching in biological sequences
+- **Needleman-Wunsch Algorithm** — dynamic programming for global sequence alignment
+- **ESMFold (Meta AI)** — transformer-based ab initio protein structure prediction
+- **Lipinski Rule of 5** — oral bioavailability prediction heuristics
+- **Random Forest QSAR** — quantitative structure–activity relationship ML regression
 
 ---
 
 ## 🛠️ Technology Stack
 
 | Category | Technology |
-| :--- | :--- |
-| **Frontend Framework** | React 18, Vite 5, TypeScript |
-| **Styling & Aesthetics** | TailwindCSS 3, Lucide Icons, Glassmorphism UI |
-| **3D Rendering** | WebGL, 3Dmol.js (py3Dmol equivalent) |
-| **Algorithms** | Needleman-Wunsch DP, Suffix Trees, Codon Translation |
-| **Machine Learning** | Logistic Regression, Random Forest QSAR Ensemble, Morgan Fingerprints |
-| **APIs** | Meta AI ESMFold REST API |
-
----
-
-## 🚀 Quick Start & Installation
-
-### Prerequisites
-- [Node.js](https://nodejs.org/) v18+ 
-- `npm` or `yarn`
-
-### Setup Instructions
-
-```bash
-# 1. Clone repository
-git clone https://github.com/FilippeZ/bioinformatics.git
-cd bioinformatics/biopipeline-app
-
-# 2. Install dependencies
-npm install
-
-# 3. Start development server
-npm run dev
-```
-
-Open your browser and navigate to `http://localhost:5173/`.
-
----
-
-## 📁 Repository Structure
-
-```
-bioinformatics/
-├── biopipeline-app/                 # Main React + Vite Application
-│   ├── public/                      # Static assets & PDB 3D models
-│   │   └── pdb/                     # 6WX6_A, AAP36762.1, WP_217683847.1 models
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── common/              # Header, Sidebar, StepperBar
-│   │   │   ├── landing/             # Sci-Fi Landing Page
-│   │   │   ├── modules/             # Module1 - Module5 UI components
-│   │   │   └── viewers/             # 3D Protein WebGL Viewer
-│   │   ├── context/                 # Pipeline State Management Context
-│   │   ├── lib/
-│   │   │   └── algorithms/          # Alignment, DNA Parser, ESMFold API, Lipinski, QSAR
-│   │   └── types/                   # TypeScript Type Definitions
-│   ├── package.json
-│   └── vite.config.ts
-├── filess/                          # Raw assignment files & datasets
-│   ├── 6WX6_A_model.pdb
-│   ├── AAP36762.1_model.pdb
-│   ├── WP_217683847.1_model.pdb
-│   ├── binding_regions.txt
-│   ├── q7.py
-│   └── seq.fasta
-└── README.md
-```
+|----------|-----------|
+| **Framework** | React 18 + TypeScript + Vite 5 |
+| **Styling** | TailwindCSS 3 (custom design tokens) + Google Fonts |
+| **3D Visualization** | NGL Viewer (WebGL) |
+| **Animation** | CSS keyframes + Canvas API |
+| **Screenshot Testing** | Playwright (Chromium headless) |
+| **State Management** | React Context API |
+| **Build Tool** | Vite |
 
 ---
 
 ## 📄 License
 
-This project is open-source under the [MIT License](LICENSE).
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+Built with ❤️ for Computational Biology · Powered by AI
+
+<img src="docs/biohelix_logo.png" alt="BioHelix" width="200" />
+
+</div>

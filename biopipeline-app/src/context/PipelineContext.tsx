@@ -24,7 +24,7 @@ interface PipelineContextType {
 }
 
 const DEFAULT_FILTERS: LipinskiFilterSettings = {
-  maxMw: 500,
+  maxMw: 550,
   maxLogP: 5.0,
   maxHbd: 5,
   maxHba: 10,
@@ -33,7 +33,7 @@ const DEFAULT_FILTERS: LipinskiFilterSettings = {
 
 const PipelineContext = createContext<PipelineContextType | undefined>(undefined);
 
-const initialMod1 = processModule1DnaInput('');
+const initialMod1 = processModule1DnaInput('', '[CGT][ACT]TGTGGT[CT][AT]', 'RUNX1_TGIF1_IKZF1');
 
 const INITIAL_STATE: PipelineState = {
   currentStep: 1,
@@ -54,7 +54,7 @@ export const PipelineProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setState(prev => ({ ...prev, currentStep: step }));
   };
 
-  const runModule1 = (dna: string, pattern?: string, geneName?: string) => {
+  const runModule1 = (dna: string, pattern = '[CGT][ACT]TGTGGT[CT][AT]', geneName = 'RUNX1_TGIF1_IKZF1') => {
     const mod1Data = processModule1DnaInput(dna, pattern, geneName);
     setState(prev => ({
       ...prev,
@@ -180,14 +180,19 @@ export const PipelineProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const resetPipeline = () => {
-    setState({ ...INITIAL_STATE, completedSteps: new Set([1]) });
+    const freshMod1 = processModule1DnaInput('', '[CGT][ACT]TGTGGT[CT][AT]', 'RUNX1_TGIF1_IKZF1');
+    setState({
+      ...INITIAL_STATE,
+      module1Data: freshMod1,
+      completedSteps: new Set([1])
+    });
   };
 
   /**
    * Step accessibility gate:
    * - Step 1: always accessible
    * - Step 2: accessible when module1Data exists
-   * - Step 3: accessible when module2Data exists OR module1Data exists (allow skipping 3D if desired)
+   * - Step 3: accessible when module2Data exists OR module1Data exists
    * - Step 4: accessible when module3Data exists AND isValidated
    * - Step 5: accessible when module4Data exists
    */

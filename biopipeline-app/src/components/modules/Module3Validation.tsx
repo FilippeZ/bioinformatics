@@ -1,24 +1,30 @@
 import React, { useState } from 'react';
 import { usePipeline } from '../../context/PipelineContext';
 import type { SingleAlignmentResult } from '../../types/bio';
-import { ShieldCheck, ShieldAlert, ArrowRight, Activity, Cpu, TestTube, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
+import { ContextHelp } from '../common/ContextHelp';
+import { Tooltip } from '../common/Tooltip';
+import { ShieldAlert, ArrowRight, Activity, Cpu, TestTube, AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Sliders } from 'lucide-react';
 
-function AlignmentRow({ row, query, ref: refSeq }: { row: string; query: string; ref: string }) {
+function AlignmentRow({ query, targetSeq }: { query: string; targetSeq: string }) {
+  const matchSymbolLine = query.split('').map((c, i) => {
+    if (c === targetSeq[i] && c !== '-') return '|';
+    if (c === '-' || targetSeq[i] === '-') return ' ';
+    return ':';
+  }).join('');
+
   return (
-    <div className="font-mono text-[10px] overflow-x-auto">
-      <div className="flex gap-1">
-        <span className="text-text-muted w-14 shrink-0">QUERY:</span>
-        <span className="text-neon-green whitespace-nowrap">{query.substring(0, 70)}</span>
+    <div className="font-mono text-xs overflow-x-auto leading-relaxed p-3 bg-surface-base/90 rounded-2xl border border-white/10 shadow-inner">
+      <div className="flex gap-2">
+        <span className="text-slate-400 w-20 shrink-0 font-bold font-sans">QUERY:</span>
+        <span className="text-emerald-400 whitespace-pre font-bold tracking-widest">{query}</span>
       </div>
-      <div className="flex gap-1">
-        <span className="text-text-muted w-14 shrink-0"></span>
-        <span className="text-text-muted/50 whitespace-nowrap">
-          {query.substring(0, 70).split('').map((c, i) => c === refSeq[i] ? '|' : c === '-' || refSeq[i] === '-' ? ' ' : ':').join('')}
-        </span>
+      <div className="flex gap-2">
+        <span className="text-slate-400 w-20 shrink-0"></span>
+        <span className="text-amber-300 whitespace-pre font-bold tracking-widest">{matchSymbolLine}</span>
       </div>
-      <div className="flex gap-1">
-        <span className="text-text-muted w-14 shrink-0">TARGET:</span>
-        <span className="text-neon-blue whitespace-nowrap">{refSeq.substring(0, 70)}</span>
+      <div className="flex gap-2">
+        <span className="text-slate-400 w-20 shrink-0 font-bold font-sans">TARGET:</span>
+        <span className="text-sky-400 whitespace-pre font-bold tracking-widest">{targetSeq}</span>
       </div>
     </div>
   );
@@ -28,9 +34,9 @@ export const Module3Validation: React.FC = () => {
   const { state, runModule3, setStep } = usePipeline();
   const mod3Data = state.module3Data;
 
-  const [matchScore, setMatchScore] = useState(2);
+  const [matchScore, setMatchScore] = useState(1);
   const [mismatchScore, setMismatchScore] = useState(-1);
-  const [gapPenalty, setGapPenalty] = useState(-2);
+  const [gapPenalty, setGapPenalty] = useState(-1);
   const [activeTarget, setActiveTarget] = useState(0);
   const [showAllTargets, setShowAllTargets] = useState(false);
 
@@ -40,127 +46,165 @@ export const Module3Validation: React.FC = () => {
   const allAlignments = (mod3Data as any)?.allAlignments as SingleAlignmentResult[] | undefined;
   const currentAlignment = allAlignments ? allAlignments[activeTarget] : null;
 
-  // Feature bars for One-Hot encoding visualization
   const featureBars = mod3Data ? [
-    { label: 'Hydrophobicity', value: mod3Data.features.hydrophobicity, color: 'bg-neon-green', maxVal: 60 },
-    { label: 'Net Charge Ratio', value: mod3Data.features.charge, color: 'bg-neon-blue', maxVal: 50 },
-    { label: 'MW (kDa)', value: Math.min(60, mod3Data.features.molecularWeight), color: 'bg-accent-amber', maxVal: 60 },
-    { label: 'Identity %', value: mod3Data.alignment.identityPercent, color: 'bg-neon-green/70', maxVal: 100 },
-    { label: 'Similarity %', value: mod3Data.alignment.similarityPercent, color: 'bg-neon-blue/70', maxVal: 100 },
+    { label: 'Hydrophobicity (%)', value: mod3Data.features.hydrophobicity, color: 'bg-emerald-400', maxVal: 100 },
+    { label: 'Net Charge Ratio (%)', value: mod3Data.features.charge, color: 'bg-sky-400', maxVal: 50 },
+    { label: 'MW (kDa)', value: Math.min(60, mod3Data.features.molecularWeight), color: 'bg-purple-400', maxVal: 60 },
+    { label: 'Identity %', value: mod3Data.alignment.identityPercent, color: 'bg-emerald-400/80', maxVal: 100 },
+    { label: 'Similarity %', value: mod3Data.alignment.similarityPercent, color: 'bg-sky-400/80', maxVal: 100 },
   ] : [];
 
   return (
-    <div className="space-y-4 max-w-6xl">
-      {/* Stage Banner */}
-      <div className="bg-surface-container border border-border-subtle rounded-xl p-4 glass-panel">
-        <div className="flex items-center space-x-2 text-xs font-mono text-neon-green uppercase tracking-wider mb-1">
-          <ShieldCheck className="w-4 h-4" />
-          <span>🛡️ Stage 3: Automated Feature Engineering & Target Validation Gate</span>
+    <div className="space-y-6 max-w-6xl mx-auto">
+
+      {/* ── Contextual Help Banner ── */}
+      <ContextHelp
+        headline="✅ Step 3: Is This a Good Drug Target?"
+        narrative="Not every protein makes a good drug target. Here, our AI compares your protein to known disease proteins using sequence alignment — like checking how similar two fingerprints are. A score above 65% means we found a strong match and can proceed to drug screening."
+        whyItMatters="Targeting the wrong protein wastes time and money. This step acts as a 'quality gate' to ensure we only proceed with proteins that are scientifically validated as drug targets."
+        facts={[
+          { emoji: '🔒', label: 'Need ≥65% score to unlock Step 4' },
+          { emoji: '🧬', label: 'Compares to 4 known disease proteins' },
+          { emoji: '🤖', label: 'AI-powered classification' },
+        ]}
+        accent="violet"
+      />
+
+      {/* ── Stage Header Banner ── */}
+      <div className="relative bg-gradient-to-r from-emerald-950/60 via-purple-900/30 to-surface-container border border-emerald-500/30 rounded-3xl p-6 shadow-2xl backdrop-blur-xl overflow-hidden group">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full filter blur-3xl group-hover:bg-emerald-500/20 transition-all duration-700 pointer-events-none" />
+        
+        <div className="relative z-10">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-sans font-medium">
+              <span className="text-base">✅</span>
+              <span>Step 3 of 5 · Drug Target Confirmation</span>
+            </div>
+            <span className="text-xs font-sans text-emerald-300/80 bg-emerald-950/80 border border-emerald-500/30 px-3.5 py-1 rounded-full shadow-inner">
+              Required Threshold: ≥ {confidenceThreshold}%
+            </span>
+          </div>
+
+          <h2 className="text-2xl sm:text-3xl font-display font-bold text-white tracking-tight mb-2 flex items-center gap-2">
+            Confirm Drug Target &amp; Evaluate Match Score
+          </h2>
+
+          <p className="text-sm font-sans text-slate-300 max-w-3xl leading-relaxed">
+            Before searching for drug molecules, our machine learning model compares your 3D protein against known disease targets (using Needleman-Wunsch global alignment) to ensure it is safe and suitable for drug therapy.
+          </p>
         </div>
-        <h2 className="text-lg font-display font-bold text-text-bright">Needleman-Wunsch Alignment + One-Hot ML Classification</h2>
-        <p className="text-xs text-text-muted mt-0.5 max-w-3xl">
-          Dual validation: Dynamic Programming global alignment against <strong className="text-neon-blue">4 known disease targets</strong> + Logistic Regression One-Hot ML classifier. Confidence threshold: ≥{confidenceThreshold}% to unlock drug screening.
-        </p>
       </div>
 
-      {/* DP Parameters Config */}
-      <div className="bg-surface-container border border-border-subtle rounded-xl p-4 glass-panel">
-        <div className="text-xs font-mono text-text-muted font-semibold mb-3">⚙️ Needleman-Wunsch DP Scoring Parameters</div>
-        <div className="flex flex-wrap items-center gap-6 text-xs font-mono">
-          <div className="flex items-center gap-2">
-            <span className="text-text-muted">Match Score:</span>
+      {/* ── Alignment Scoring Settings Card ── */}
+      <div className="bg-surface-container/80 backdrop-blur-md border border-white/10 rounded-3xl p-5 space-y-4 shadow-xl">
+        <div className="flex items-center justify-between">
+          <div className="text-xs font-sans font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <Sliders className="w-4 h-4 text-emerald-400" />
+            <Tooltip
+              term="Sequence Comparison Rules"
+              definition="Needleman-Wunsch is an algorithm that slides two protein sequences alongside each other, awarding points for matches and deducting for mismatches or gaps — similar to a 'diff' for genetic code."
+            />
+          </div>
+          <span className="text-[11px] font-sans text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-0.5 rounded-full font-medium">
+            Standard: Match +1, Mismatch -1, Gap -1
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-sans text-xs">
+          <div className="flex items-center justify-between p-3 rounded-2xl bg-surface-base/80 border border-white/10">
+            <span className="text-slate-300">Match Score:</span>
             <input
               type="number" value={matchScore}
               onChange={e => setMatchScore(Number(e.target.value))}
-              className="w-16 bg-surface-base border border-neon-green/40 rounded px-2 py-1 text-neon-green text-center focus:outline-none focus:border-neon-green"
+              className="w-16 bg-surface-base border border-emerald-500/50 rounded-xl px-2.5 py-1 text-emerald-400 text-center font-bold text-sm focus:outline-none focus:border-emerald-400"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-text-muted">Mismatch Penalty:</span>
+          <div className="flex items-center justify-between p-3 rounded-2xl bg-surface-base/80 border border-white/10">
+            <span className="text-slate-300">Mismatch Penalty:</span>
             <input
               type="number" value={mismatchScore}
               onChange={e => setMismatchScore(Number(e.target.value))}
-              className="w-16 bg-surface-base border border-data-error/40 rounded px-2 py-1 text-data-error text-center focus:outline-none focus:border-data-error"
+              className="w-16 bg-surface-base border border-red-500/50 rounded-xl px-2.5 py-1 text-red-400 text-center font-bold text-sm focus:outline-none focus:border-red-400"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-text-muted">Gap Penalty:</span>
+          <div className="flex items-center justify-between p-3 rounded-2xl bg-surface-base/80 border border-white/10">
+            <span className="text-slate-300">Gap Penalty:</span>
             <input
               type="number" value={gapPenalty}
               onChange={e => setGapPenalty(Number(e.target.value))}
-              className="w-16 bg-surface-base border border-border-subtle rounded px-2 py-1 text-text-muted text-center focus:outline-none"
+              className="w-16 bg-surface-base border border-amber-500/50 rounded-xl px-2.5 py-1 text-amber-300 text-center font-bold text-sm focus:outline-none focus:border-amber-400"
             />
           </div>
-          <div className="text-text-muted text-[10px] ml-auto">Algorithm: Needleman-Wunsch (Global) → Logistic Regression</div>
         </div>
       </div>
 
-      {/* Execute Button */}
+      {/* ── Action Button ── */}
       <button
         onClick={() => runModule3(matchScore, mismatchScore, gapPenalty)}
-        className="w-full bg-neon-blue/20 hover:bg-neon-blue/30 border border-neon-blue/60 text-neon-blue font-mono font-bold text-sm py-3 rounded-xl flex items-center justify-center gap-2 transition-all max-w-6xl shadow-sm shadow-neon-blue/10 active:scale-[0.98]"
+        className="w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 hover:from-emerald-400 hover:to-sky-400 text-slate-950 font-display font-bold text-sm py-4 rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-xl shadow-emerald-500/20 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
       >
-        <TestTube className="w-5 h-5" />
-        🧪 EVALUATE TARGET VALIDITY & ALIGNMENT (All 4 Disease Targets)
+        <TestTube className="w-5 h-5 fill-slate-950" />
+        Run Drug Target Suitability Check
       </button>
 
+      {/* ── Results Display ── */}
       {mod3Data && (
-        <div className="space-y-4">
-          {/* Multi-target alignment tabs */}
+        <div className="space-y-6">
+
+          {/* All Target Alignments Accordion */}
           {allAlignments && allAlignments.length > 0 && (
-            <div className="bg-surface-container border border-border-subtle rounded-xl glass-panel overflow-hidden">
+            <div className="bg-surface-container/80 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden shadow-xl">
               <button
                 onClick={() => setShowAllTargets(p => !p)}
-                className="w-full flex items-center justify-between p-4 text-sm font-display font-semibold text-text-bright"
+                className="w-full flex items-center justify-between p-5 text-sm font-display font-bold text-white hover:bg-white/5 transition-colors"
               >
                 <div className="flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-neon-blue" />
-                  Multi-Target NW Alignment Results (Best Match: {allAlignments[0]?.name})
+                  <Activity className="w-4 h-4 text-sky-400" />
+                  View Alignment Across All 4 Reference Targets (Best Match: <span className="text-emerald-400">{allAlignments[0]?.name}</span>)
                 </div>
-                {showAllTargets ? <ChevronUp className="w-4 h-4 text-text-muted" /> : <ChevronDown className="w-4 h-4 text-text-muted" />}
+                {showAllTargets ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
               </button>
 
               {showAllTargets && (
-                <div className="border-t border-border-subtle">
-                  {/* Target selector tabs */}
-                  <div className="flex overflow-x-auto border-b border-border-subtle">
+                <div className="border-t border-white/10 p-5 space-y-4">
+                  {/* Tabs */}
+                  <div className="flex overflow-x-auto gap-2 pb-2">
                     {allAlignments.map((t, i) => (
                       <button
                         key={t.id}
                         onClick={() => setActiveTarget(i)}
-                        className={`px-3 py-2 text-[10px] font-mono font-semibold whitespace-nowrap shrink-0 transition-all border-b-2 ${activeTarget === i ? 'border-neon-blue text-neon-blue bg-neon-blue/5' : 'border-transparent text-text-muted hover:text-text-bright'}`}
+                        className={`px-4 py-2 text-xs font-sans rounded-xl font-semibold shrink-0 transition-all cursor-pointer ${
+                          activeTarget === i
+                            ? 'bg-sky-500/20 border border-sky-400 text-sky-300 shadow-md shadow-sky-500/10'
+                            : 'bg-surface-base/80 border border-white/5 text-slate-400 hover:text-white'
+                        }`}
                       >
                         {i === 0 && '🥇 '}{t.id} ({t.alignment.identityPercent}% ID)
                       </button>
                     ))}
                   </div>
 
-                  {/* Alignment view for active target */}
                   {currentAlignment && (
-                    <div className="p-4 space-y-3">
-                      <div className="flex flex-wrap gap-3 font-mono text-xs">
-                        <div className="bg-surface-base p-2.5 rounded border border-border-subtle text-center flex-1">
-                          <div className="text-[10px] text-text-muted">Identity %</div>
-                          <div className="text-xl font-bold text-neon-green">{currentAlignment.alignment.identityPercent}%</div>
+                    <div className="space-y-4 bg-surface-base/50 rounded-2xl p-4 border border-white/5">
+                      <div className="grid grid-cols-3 gap-3 font-sans text-xs">
+                        <div className="bg-surface-base p-3 rounded-2xl border border-white/10 text-center">
+                          <div className="text-slate-400 text-[11px] mb-1">Identity %</div>
+                          <div className="text-2xl font-display font-bold text-emerald-400">{currentAlignment.alignment.identityPercent}%</div>
                         </div>
-                        <div className="bg-surface-base p-2.5 rounded border border-border-subtle text-center flex-1">
-                          <div className="text-[10px] text-text-muted">Similarity %</div>
-                          <div className="text-xl font-bold text-neon-blue">{currentAlignment.alignment.similarityPercent}%</div>
+                        <div className="bg-surface-base p-3 rounded-2xl border border-white/10 text-center">
+                          <div className="text-slate-400 text-[11px] mb-1">Similarity %</div>
+                          <div className="text-2xl font-display font-bold text-sky-400">{currentAlignment.alignment.similarityPercent}%</div>
                         </div>
-                        <div className="bg-surface-base p-2.5 rounded border border-border-subtle text-center flex-1">
-                          <div className="text-[10px] text-text-muted">NW Score</div>
-                          <div className="text-xl font-bold text-text-bright">{currentAlignment.alignment.score}</div>
+                        <div className="bg-surface-base p-3 rounded-2xl border border-white/10 text-center">
+                          <div className="text-slate-400 text-[11px] mb-1">NW Alignment Score</div>
+                          <div className="text-2xl font-display font-bold text-white">{currentAlignment.alignment.score}</div>
                         </div>
                       </div>
-                      <div className="text-[10px] font-mono text-text-muted">{currentAlignment.description}</div>
-                      <div className="bg-surface-base p-3 rounded-lg border border-border-subtle overflow-x-auto">
-                        <div className="text-[9px] text-text-muted mb-2">Alignment traceback → {currentAlignment.name}:</div>
-                        <AlignmentRow
-                          row={currentAlignment.id}
-                          query={currentAlignment.alignment.alignedQuery}
-                          ref={currentAlignment.alignment.alignedRef}
-                        />
-                      </div>
+                      <div className="text-xs font-sans text-slate-300">{currentAlignment.description}</div>
+                      <AlignmentRow
+                        query={currentAlignment.alignment.alignedQuery}
+                        targetSeq={currentAlignment.alignment.alignedRef}
+                      />
                     </div>
                   )}
                 </div>
@@ -168,84 +212,105 @@ export const Module3Validation: React.FC = () => {
             </div>
           )}
 
-          {/* Main diagnostics */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            {/* Left: Best NW alignment */}
-            <div className="bg-surface-container border border-border-subtle rounded-xl p-4 glass-panel space-y-3">
-              <h3 className="font-display font-semibold text-sm text-text-bright flex items-center gap-2">
-                <Activity className="w-4 h-4 text-neon-blue" />
-                Best Match: Needleman-Wunsch Alignment
+          {/* Main Diagnostics Grid */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+            {/* Left: Best Alignment */}
+            <div className="bg-surface-container/80 backdrop-blur-md border border-white/10 rounded-3xl p-5 space-y-4 shadow-xl">
+              <h3 className="font-display font-bold text-sm text-white flex items-center gap-2">
+                <Activity className="w-4 h-4 text-sky-400" />
+                Best Disease Target Alignment Match
               </h3>
 
-              <div className="grid grid-cols-3 gap-2 font-mono text-xs">
-                <div className="bg-surface-base p-2.5 rounded border border-border-subtle text-center">
-                  <div className="text-[10px] text-text-muted">Identity %</div>
-                  <div className="text-xl font-bold text-neon-green">{mod3Data.alignment.identityPercent}%</div>
+              <div className="grid grid-cols-3 gap-3 font-sans text-xs">
+                <div className="bg-surface-base/90 p-3 rounded-2xl border border-white/10 text-center">
+                  <div className="text-slate-400 text-[11px] mb-1">Identity %</div>
+                  <div className="text-2xl font-display font-bold text-emerald-400">{mod3Data.alignment.identityPercent}%</div>
                 </div>
-                <div className="bg-surface-base p-2.5 rounded border border-border-subtle text-center">
-                  <div className="text-[10px] text-text-muted">Similarity %</div>
-                  <div className="text-xl font-bold text-neon-blue">{mod3Data.alignment.similarityPercent}%</div>
+                <div className="bg-surface-base/90 p-3 rounded-2xl border border-white/10 text-center">
+                  <div className="text-slate-400 text-[11px] mb-1">Similarity %</div>
+                  <div className="text-2xl font-display font-bold text-sky-400">{mod3Data.alignment.similarityPercent}%</div>
                 </div>
-                <div className="bg-surface-base p-2.5 rounded border border-border-subtle text-center">
-                  <div className="text-[10px] text-text-muted">NW Score</div>
-                  <div className="text-xl font-bold text-text-bright">{mod3Data.alignment.score}</div>
+                <div className="bg-surface-base/90 p-3 rounded-2xl border border-white/10 text-center">
+                  <div className="text-slate-400 text-[11px] mb-1">Score</div>
+                  <div className="text-2xl font-display font-bold text-white">{mod3Data.alignment.score}</div>
                 </div>
               </div>
 
-              <div className="bg-surface-base p-3 rounded-lg border border-border-subtle">
-                <div className="text-[9px] text-text-muted mb-2">Best match target: {mod3Data.alignment.matchedDiseaseTarget}</div>
+              <div className="bg-surface-base/90 p-4 rounded-2xl border border-white/10 space-y-3">
+                <div className="text-xs font-sans text-slate-300">
+                  Best match disease target: <strong className="text-sky-400 font-bold">{mod3Data.alignment.matchedDiseaseTarget}</strong>
+                </div>
                 <AlignmentRow
-                  row=""
                   query={mod3Data.alignment.alignedQuery}
-                  ref={mod3Data.alignment.alignedRef}
+                  targetSeq={mod3Data.alignment.alignedRef}
                 />
               </div>
             </div>
 
-            {/* Right: One-Hot ML Classification */}
-            <div className="bg-surface-container border border-border-subtle rounded-xl p-4 glass-panel space-y-3">
-              <h3 className="font-display font-semibold text-sm text-text-bright flex items-center gap-2">
-                <Cpu className="w-4 h-4 text-neon-green" />
-                One-Hot ML Feature Classification
+            {/* Right: ML Classification */}
+            <div className="bg-surface-container/80 backdrop-blur-md border border-white/10 rounded-3xl p-5 space-y-4 shadow-xl">
+              <h3 className="font-display font-bold text-sm text-white flex items-center gap-2">
+                <Cpu className="w-4 h-4 text-emerald-400" />
+                Target Suitability Machine Learning Score
               </h3>
 
-              {/* Big Score */}
-              <div className={`p-4 rounded-xl border ${passes ? 'bg-neon-green/10 border-neon-green/40' : 'bg-data-error/10 border-data-error/30'}`}>
-                <div className={`text-[11px] font-mono uppercase tracking-wider ${passes ? 'text-neon-green' : 'text-data-error'}`}>
-                  Logistic Regression → {passes ? 'Valid Pharmaceutical Target ✓' : 'Low Confidence Target ✗'}
+              {/* Score Card */}
+              <div className={`p-5 rounded-2xl border ${passes ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-red-500/10 border-red-500/40'}`}>
+                <div className={`text-xs font-sans font-bold flex items-center gap-1.5 ${passes ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {passes ? <CheckCircle2 className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
+                  {passes ? '✓ Strong Drug Target — Proceeding to Molecule Screening' : 'Below Required Threshold'}
                 </div>
-                <div className={`text-4xl font-display font-bold mt-1 ${passes ? 'text-neon-green' : 'text-data-error'}`}>
+                <div className={`text-5xl font-display font-black mt-2 ${passes ? 'text-emerald-400' : 'text-red-400'}`}>
                   {mod3Data.validityScore}%
                 </div>
-                <div className="text-[11px] font-mono text-text-muted mt-0.5">ML Confidence Score (σ-weighted logistic)</div>
-                <div className="w-full bg-surface-base h-2 rounded-full mt-3 overflow-hidden">
+                <div className="text-xs font-sans text-text-bright font-semibold mt-1">
+                  {mod3Data.validityScore >= 90
+                    ? 'Excellent! This protein is a prime drug target.'
+                    : mod3Data.validityScore >= 65
+                      ? 'Good match — this protein is suitable for drug therapy.'
+                      : `Not enough evidence yet. Try adjusting the scoring rules above (need ≥${confidenceThreshold}%).`}
+                </div>
+                <div className="text-[10px] font-sans text-slate-400 mt-0.5">
+                  <Tooltip term="Drug Target Score" definition="This AI-calculated score (0–100%) reflects how well the protein's physical and chemical properties match known druggable proteins. Above 65% = proceed. Below 65% = not recommended." />
+                </div>
+                <div className="w-full bg-slate-800 h-2.5 rounded-full mt-3 overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all duration-700 ${passes ? 'bg-neon-green' : 'bg-data-error'}`}
+                    className={`h-full rounded-full transition-all duration-1000 ${passes ? 'bg-emerald-400' : 'bg-red-400'}`}
                     style={{ width: `${mod3Data.validityScore}%` }}
                   />
                 </div>
-                <div className="flex justify-between text-[9px] font-mono text-text-muted mt-1">
-                  <span>0%</span><span className="text-neon-green">Threshold: {confidenceThreshold}%</span><span>100%</span>
+                <div className="flex justify-between text-[10px] font-sans text-slate-400 mt-1">
+                  <span>0%</span><span className="text-emerald-400 font-bold">Required: {confidenceThreshold}%</span><span>100%</span>
                 </div>
               </div>
 
-              {/* One-Hot feature bars */}
-              <div className="space-y-2">
-                <div className="text-[10px] text-text-muted uppercase font-semibold font-mono">One-Hot Feature Vector (Biochemical):</div>
-                {featureBars.map(f => (
-                  <div key={f.label} className="space-y-0.5">
-                    <div className="flex justify-between font-mono text-[10px]">
-                      <span className="text-text-muted">{f.label}</span>
-                      <span className="text-text-bright font-bold">{f.value.toFixed(1)}</span>
+              {/* Feature Descriptors */}
+              <div className="space-y-3 bg-surface-base/90 rounded-2xl p-4 border border-white/10">
+                <div className="text-xs font-sans font-bold text-slate-300 flex items-center gap-1">
+                  Protein Properties Evaluated
+                  <Tooltip term="What are these properties?" definition="These are physical and chemical properties of the protein. The AI uses them as 'features' to predict how druggable the protein is — similar to a medical checkup for the molecule." />
+                </div>
+                {[
+                  { ...featureBars[0], label: 'Water Repellency (Hydrophobicity)', friendly: 'How well a drug can bind to this protein' },
+                  { ...featureBars[1], label: 'Electrical Charge Ratio', friendly: 'Affects how drug molecules interact with the protein' },
+                  { ...featureBars[2], label: 'Protein Size (Molecular Weight)', friendly: 'Larger proteins have more potential binding sites' },
+                  { ...featureBars[3], label: 'Sequence Identity Match', friendly: 'How similar to known disease targets' },
+                  { ...featureBars[4], label: 'Sequence Similarity Score', friendly: 'Broader similarity including related amino acids' },
+                ].map(f => (
+                  <div key={f.label} className="space-y-1">
+                    <div className="flex justify-between font-sans text-xs">
+                      <span className="text-slate-300 font-medium">{f.label}</span>
+                      <span className="text-white font-bold">{f.value.toFixed(1)}</span>
                     </div>
-                    <div className="h-1.5 bg-surface-base rounded-full overflow-hidden">
-                      <div className={`h-full ${f.color} rounded-full transition-all duration-500`} style={{ width: `${Math.min(100, (f.value / f.maxVal) * 100)}%` }} />
+                    <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                      <div className={`h-full ${f.color} rounded-full transition-all duration-700`} style={{ width: `${Math.min(100, (f.value / f.maxVal) * 100)}%` }} />
                     </div>
                   </div>
                 ))}
-                <div className="flex justify-between font-mono text-xs">
-                  <span className="text-text-muted">Druggability:</span>
-                  <span className={`font-bold ${mod3Data.druggabilityCategory === 'High Druggability' ? 'text-neon-green' : mod3Data.druggabilityCategory === 'Moderate Druggability' ? 'text-accent-amber' : 'text-data-error'}`}>
+                <div className="flex justify-between font-sans text-xs pt-2 border-t border-white/5">
+                  <span className="text-slate-400">Druggability Category:</span>
+                  <span className={`font-bold ${mod3Data.druggabilityCategory === 'High Druggability' ? 'text-emerald-400' : mod3Data.druggabilityCategory === 'Moderate Druggability' ? 'text-amber-400' : 'text-red-400'}`}>
                     {mod3Data.druggabilityCategory}
                   </span>
                 </div>
@@ -253,34 +318,20 @@ export const Module3Validation: React.FC = () => {
             </div>
           </div>
 
-          {/* Validation Gate Status */}
+          {/* Handoff Button */}
           {passes ? (
-            <div className="bg-neon-green/10 border border-neon-green/40 rounded-xl p-4 flex items-center gap-3 font-mono text-sm text-neon-green">
-              <ShieldCheck className="w-6 h-6 shrink-0" />
-              <div>
-                <div className="font-bold">🟢 VALIDATION PASSED — Confidence {mod3Data.validityScore}% ≥ {confidenceThreshold}% Threshold</div>
-                <div className="text-xs mt-0.5 text-neon-green/80">Target unlocked for Cheminformatics Compound Screening. Drug discovery pipeline may proceed.</div>
-              </div>
-            </div>
+            <button
+              onClick={() => setStep(4)}
+              className="w-full bg-gradient-to-r from-emerald-400 to-sky-400 text-slate-950 hover:from-emerald-300 hover:to-sky-300 font-display font-bold text-sm py-4 rounded-2xl flex items-center justify-center gap-2.5 shadow-xl shadow-emerald-500/20 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+            >
+              🎉 Target Confirmed! Proceed to Screen Drug Molecules <ArrowRight className="w-5 h-5" />
+            </button>
           ) : (
-            <div className="bg-data-error/10 border border-data-error/30 rounded-xl p-4 flex items-center gap-3 font-mono text-sm text-data-error">
-              <AlertTriangle className="w-6 h-6 shrink-0" />
-              <div>
-                <div className="font-bold">⚠️ TARGET VALIDATION FAILED — Low confidence ({mod3Data.validityScore}% &lt; {confidenceThreshold}%)</div>
-                <div className="text-xs mt-0.5">The pipeline has halted. Return to Stage 1 and provide a different DNA sequence or adjust the scoring parameters above.</div>
-              </div>
+            <div className="p-5 bg-red-500/10 border border-red-500/30 rounded-3xl text-center font-sans text-sm text-red-300 flex items-center justify-center gap-2 backdrop-blur-md">
+              <ShieldAlert className="w-5 h-5 shrink-0 text-red-400" />
+              Score of {mod3Data.validityScore}% is below the required {confidenceThreshold}%. Try adjusting the Match/Mismatch scores above and run again.
             </div>
           )}
-
-          {/* Gate-controlled handoff */}
-          <button
-            onClick={() => setStep(4)}
-            disabled={!passes}
-            className="w-full bg-neon-green text-surface-base hover:bg-neon-green/90 font-mono font-bold text-sm py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-neon-green/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed max-w-6xl active:scale-[0.98]"
-          >
-            🧹 OPEN CHEMINFORMATICS COMPOUND FILTER
-            <ArrowRight className="w-4 h-4" />
-          </button>
         </div>
       )}
     </div>

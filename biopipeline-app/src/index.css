@@ -1,54 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --color-surface-base: #0A0A0A;
-  --color-surface-container: #131313;
+  --color-surface-base: #050B1A;
+  --color-surface-container: #0D1526;
   --color-neon-green: #00FF7F;
   --color-neon-blue: #00E0FF;
+  --color-brand-indigo: #6366F1;
+  --color-bio-emerald: #10B981;
 }
 
 @layer utilities {
   .duration-900 {
     transition-duration: 900ms;
   }
+
+  /* Tooltip anchor — adds the underline indicator on jargon terms */
+  .glossary-term {
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.4);
+    cursor: help;
+  }
 }
 
 body {
-  background-color: #0A0A0A;
-  color: #E5E2E1;
+  background-color: #050B1A;
+  color: #E2EBF5;
   font-family: 'Inter', sans-serif;
 }
 
-/* Sci-Fi Cyber Scrollbar */
+/* Scientific Blue Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #0A0A0A;
+  background: #050B1A;
 }
 ::-webkit-scrollbar-thumb {
-  background: #222222;
+  background: #1E3050;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #00FF7F;
+  background: #6366F1;
 }
 
-/* Glassmorphism containers */
+/* Glassmorphism containers — navy tinted */
 .glass-panel {
-  background: rgba(19, 19, 19, 0.85);
+  background: rgba(13, 21, 38, 0.85);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .glass-panel-glow {
-  background: rgba(19, 19, 19, 0.9);
+  background: rgba(13, 21, 38, 0.90);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 255, 127, 0.25);
-  box-shadow: 0 0 20px rgba(0, 255, 127, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  box-shadow: 0 0 24px rgba(99, 102, 241, 0.08);
+}
+
+.glass-panel-success {
+  background: rgba(16, 185, 129, 0.06);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.07);
 }
 
 /* Glowing text helpers */
@@ -58,4 +75,38 @@ body {
 
 .text-glow-blue {
   text-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+}
+
+.text-glow-indigo {
+  text-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+}
+
+/* Context help banner */
+.context-help-banner {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.04) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 16px;
+  padding: 14px 18px;
+}
+
+/* Animated step connector line */
+.step-connector {
+  background: linear-gradient(90deg, #1E3050 0%, #6366F1 100%);
+  height: 2px;
+  flex: 1;
+  transition: background 0.5s ease;
+}
+.step-connector.active {
+  background: linear-gradient(90deg, #6366F1 0%, #10B981 100%);
+}
+
+/* Pill badge utility */
+.pill-pass {
+  @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-bio-emerald/15 text-bio-emerald border border-bio-emerald/30;
+}
+.pill-fail {
+  @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-bio-rose/15 text-bio-rose border border-bio-rose/30;
+}
+.pill-pending {
+  @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-text-muted/10 text-text-muted border border-text-muted/20;
 }
