@@ -272,7 +272,7 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 <div align="center">
 
-Built with ❤️ for Computational Biology · Powered by AI
+Built with ❤️ for Computational Biology 
 
 <img src="docs/biohelix_logo.png" alt="BioHelix" width="200" />
 
