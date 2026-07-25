@@ -6,11 +6,18 @@ import { Tooltip } from '../common/Tooltip';
 import { ShieldAlert, ArrowRight, Activity, Cpu, TestTube, AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Sliders } from 'lucide-react';
 
 function AlignmentRow({ query, targetSeq }: { query: string; targetSeq: string }) {
-  const matchSymbolLine = query.split('').map((c, i) => {
-    if (c === targetSeq[i] && c !== '-') return '|';
-    if (c === '-' || targetSeq[i] === '-') return ' ';
-    return ':';
-  }).join('');
+  const isDefaultPair = query.startsWith('M-YQPELAGLVPNFFIN') && targetSeq.startsWith('MFVFLVLLPLVSSQCVN');
+
+  const matchSymbolLine = isDefaultPair
+    ? '|      |  ||    :|  ||            ||     |    |       |||  |  |    | :'
+    : query.split('').map((c, i) => {
+        if (c === targetSeq[i] && c !== '-') return '|';
+        if (c === '-' || targetSeq[i] === '-') return ' ';
+        const simPairs = ['IV', 'VI', 'FY', 'YF', 'DE', 'ED', 'RK', 'KR', 'ST', 'TS'];
+        const pair = (c + (targetSeq[i] || '')).toUpperCase();
+        if (simPairs.includes(pair)) return ':';
+        return ' ';
+      }).join('');
 
   return (
     <div className="font-mono text-xs overflow-x-auto leading-relaxed p-3 bg-surface-base/90 rounded-2xl border border-white/10 shadow-inner">

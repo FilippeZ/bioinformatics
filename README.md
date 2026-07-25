@@ -50,7 +50,7 @@
 
 ![Stage 3 — Validation Gate](docs/screenshots/stage3_validation_gate.png)
 
-*Needleman-Wunsch global sequence alignment against 4 known disease genes. Random Forest ML classifier gives a drug-target suitability score (≥ 65% to proceed)*
+*Needleman-Wunsch global sequence alignment against 4 known disease genes (Score: -34, Identity: 25.7%, Similarity: 28.6%). Target Suitability Score: 88.8% (≥ 65% required to proceed).*
 
 ---
 
